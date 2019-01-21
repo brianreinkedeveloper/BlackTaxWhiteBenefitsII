@@ -41,7 +41,7 @@ class Adapter(val myList: MutableList<RecycleDTO>): RecyclerView.Adapter<Adapter
     inner class ViewHolder (v: View) : RecyclerView.ViewHolder(v), View.OnClickListener {
         // No findViewById() because this version of Android Studio uses
         //    kotlin-android-extensions plugin, which avoids the use of needing findViewById().
-        val titleView: TextView = v.txtTitle
+        val titleView: TextView = v.text_title
         val imageView: ImageView = v.imgBlogGraphic
 
 

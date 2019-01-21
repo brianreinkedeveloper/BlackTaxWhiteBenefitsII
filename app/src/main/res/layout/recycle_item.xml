@@ -1,53 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_width="match_parent">
+    android:orientation="vertical">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="4dp">
 
-        <!-- acts as an imageview -->
         <RelativeLayout
-            android:id="@+id/rlrecycleitem"
+            android:id="@+id/viewgroup_article_thumbnail"
             android:layout_width="@dimen/imgBlogSizeBorder"
             android:layout_height="@dimen/imgBlogSizeBorder"
             android:background="@color/colorSecondaryLight"
-            android:paddingLeft="2dp">
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp">
 
+            <!-- TODO: Fix nested layout; switch  a two  linearlayouts instead of one linear two relative.. for simplicity -->
             <ImageView
-                    android:id="@+id/imgBlogGraphic"
-                    android:contentDescription="@string/blog_article_content_description"
-                    android:padding="4dp"
-                    android:layout_width="@dimen/imgBlogSizeBorder"
-                    android:layout_height="@dimen/imgBlogSizeBorder"
-                    android:scaleType="centerInside">
-            </ImageView>
+                android:id="@+id/imgBlogGraphic"
+                android:layout_width="@dimen/imgBlogSizeBorder"
+                android:layout_height="@dimen/imgBlogSizeBorder"
+                android:contentDescription="@string/blog_article_content_description"
+                android:padding="4dp"
+                android:scaleType="centerInside" />
         </RelativeLayout>
 
-        <!-- android:paddingBottom="20dp" - makes the centering look just a bit better -->
         <TextView
-                android:id="@+id/txtTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:hint="@string/title_hint"
-                android:textSize="17sp"
-                android:paddingBottom="20dp"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/rlrecycleitem">
-            </TextView>
+            android:id="@+id/text_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/viewgroup_article_thumbnail"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="20dp"
+            android:textSize="@dimen/title_font_size" />
     </RelativeLayout>
 
-    <!-- Generates a line -->
     <View
-        android:layout_height="1dp"
         android:layout_width="match_parent"
-        android:background="#BDBDBD">
-    </View>
+        android:layout_height="1dp"
+        android:background="@color/dividerColor" />
 </LinearLayout>
