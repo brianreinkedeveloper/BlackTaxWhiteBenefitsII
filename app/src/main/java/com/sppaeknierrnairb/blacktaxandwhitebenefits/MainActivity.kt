@@ -227,6 +227,7 @@ class MainActivity : AppCompatActivity() {
             val adapter = Adapter(list)
             recyclerView.adapter=adapter
             recyclerView.layoutManager=llm
+            // TODO: Remove redundant local variable llm
         }
     }
 }

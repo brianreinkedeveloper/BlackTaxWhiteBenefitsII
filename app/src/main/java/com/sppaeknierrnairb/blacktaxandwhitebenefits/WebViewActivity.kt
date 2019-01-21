@@ -43,6 +43,7 @@ class WebViewActivity: AppCompatActivity() {
     private fun sendBlog(appTitle: String, blogTitle: String, blogURL: String) {
         val messageStr = "From: $appTitle:\n\n$blogTitle\n\n$blogURL"
 
+        // TODO: Please take away the subject - you don't want to 'force' the user to share as email
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             // Adding Subject Intent in case user wants to send an email:

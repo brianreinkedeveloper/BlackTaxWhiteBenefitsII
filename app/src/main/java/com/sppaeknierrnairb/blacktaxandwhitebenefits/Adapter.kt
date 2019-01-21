@@ -70,6 +70,11 @@ class Adapter(val myList: MutableList<RecycleDTO>): RecyclerView.Adapter<Adapter
             catch (e: IndexOutOfBoundsException) {
                 // don't do anything.
             }
+
+            // TODO: Fix this - 1) Having a catch statement without even a Log.e is very rarely a good idea.
+            // you should think about if this ever would happen what you would want to do.
+            // In your case you should probably use @parcelize or parcelable eventually
+            // although good job for getting something working.
         }
     }
 }
