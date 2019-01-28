@@ -3,9 +3,11 @@ package com.sppaeknierrnairb.blacktaxandwhitebenefits
 
 
 
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.text.Html
 import android.util.Log
 import android.view.View
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.BlogArticles
@@ -167,11 +169,13 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun parseTitle(title: String): String {
-        var titleMod = title
+        val titleMod: String
 
-        titleMod=titleMod.replace(" &#8220;", " \"")
-        titleMod=titleMod.replace("&#8221;", "\"")
-        titleMod=titleMod.replace(" &#8212", "")
+        if (Build.VERSION.SDK_INT >= 24) {
+            titleMod= Html.fromHtml(title , Html.FROM_HTML_MODE_LEGACY).toString()
+        } else {
+            titleMod= Html.fromHtml(title).toString()
+        }
 
         return titleMod
     }
