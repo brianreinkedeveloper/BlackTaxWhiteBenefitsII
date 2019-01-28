@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.webkit.WebSettings
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_webview.*
 
 class WebViewActivity: AppCompatActivity() {
@@ -98,10 +97,16 @@ class WebViewActivity: AppCompatActivity() {
         // Load the image
         //
         if (blogArticleData[2] != "") {
-            Picasso.get().load(blogArticleData[2]).into(imgWebView)
+            GlideApp
+                .with(this)
+                .load(blogArticleData[2])
+                .into(imgWebView)
         } else {
             // Load default image.
-            Picasso.get().load(R.drawable.no_image).into(imgWebView)
+            GlideApp
+                .with(this)
+                .load(R.drawable.no_image)
+                .into(imgWebView)
         }
 
         // Load the URL Link
