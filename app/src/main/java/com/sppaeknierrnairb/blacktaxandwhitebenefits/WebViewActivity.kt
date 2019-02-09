@@ -1,8 +1,10 @@
 package com.sppaeknierrnairb.blacktaxandwhitebenefits
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.Html
 import android.view.Menu
 import android.view.MenuItem
 import android.webkit.WebSettings
@@ -110,8 +112,8 @@ class WebViewActivity: AppCompatActivity() {
 
         // Lastly, load the webview.
         // Note: WebView just needs the html from JSON...it automatically enters in the HTML header info.
-        val htmlContext = blogArticleData[3]
-        webview.loadData(htmlContext, "text/html; charset=UTF-8", null)
+        val convertedBlogArticleData=preUTFConversions(blogArticleData[3])
+        webview.loadData(convertedBlogArticleData, "text/html; charset=utf-8", "utf-8")
 
 
         //
@@ -121,6 +123,22 @@ class WebViewActivity: AppCompatActivity() {
         websettings.defaultFontSize = ProjectData.htmlTextSize
     }
 
+
+
+    private fun preUTFConversions(s: String): String {
+        // For some reason, webview.loadData() on phones isn't properly converting the dash.  Instead, it shows up as "&#8211;".
+        //  However, on the emulators, it works.
+
+        var convertedString: String
+
+        if (Build.VERSION.SDK_INT >= 24) {
+            convertedString= Html.fromHtml(s , Html.FROM_HTML_MODE_LEGACY).toString()
+        } else {
+            convertedString= Html.fromHtml(s).toString()
+        }
+
+        return convertedString
+    }
 
 
     private fun blogDateConversion(s: String): String {
