@@ -67,6 +67,9 @@ class MainActivity : AppCompatActivity() {
         butPagePrev.setOnClickListener {
             ProjectData.buttonClicked="prev"
 
+            // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
+            recyclerView.visibility=View.INVISIBLE
+
             // Turn "off" buttons until network load finishes
             butPagePrev.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
             butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
@@ -87,7 +90,10 @@ class MainActivity : AppCompatActivity() {
             ProjectData.buttonClicked="next"
             butPageNext.isEnabled=false
 
-            // Turn "off" buttons until network load finishes
+            // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
+            recyclerView.visibility=View.INVISIBLE
+
+            // Turn "off" buttons until network load finishes to give a 'disabled' look.
             butPagePrev.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
             butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
 
@@ -165,6 +171,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun stopProgressBar() {
         progressBar1.visibility=View.INVISIBLE
+        recyclerView.visibility=View.VISIBLE
     }
 
 
