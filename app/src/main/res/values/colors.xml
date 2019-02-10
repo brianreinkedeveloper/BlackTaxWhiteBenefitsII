@@ -7,4 +7,5 @@
     <color name="colorSecondaryLight">#8eacbb</color>
 
     <color name="colorWidgetLight">#efefef</color>
+    <color name="dividerColor">#BDBDBD</color>
 </resources>

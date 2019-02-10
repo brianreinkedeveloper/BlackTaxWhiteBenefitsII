@@ -2,7 +2,6 @@
     <string name="app_name">Black Tax and White Benefits</string>
     <string name="posted_date_11_21_2018">Posted Date: 11/21/2018</string>
     <string name="blog_article_content_description">Image that pertains to the blog article.</string>
-    <string name="title_hint">title</string>
     <string name="webview_image">The image on the content page associated with the blog.</string>
     <integer name="title_maxlength">35</integer>
 </resources>
