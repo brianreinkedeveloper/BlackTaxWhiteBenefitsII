@@ -7,4 +7,5 @@
     <dimen name="imgBlogSizeBorder">144dp</dimen>
 
     <dimen name="webViewImageSize">260dp</dimen>
+    <dimen name="title_font_size">17sp</dimen>
 </resources>
