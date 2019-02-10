@@ -1,26 +1,37 @@
 package com.sppaeknierrnairb.blacktaxandwhitebenefits
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.view.MenuItem
 import android.webkit.WebSettings
 import kotlinx.android.synthetic.main.activity_webview.*
+
+
 
 class WebViewActivity: AppCompatActivity() {
     private lateinit var titleData: String
     private lateinit var modPostedDate: String
     private lateinit var modDate: String
     private lateinit var urlLink: String
+    private lateinit var blogArticleData: ArrayList<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_webview)
 
+        blogArticleData= intent.getStringArrayListExtra(ProjectData.putExtra_BlogWebView)
+
+        imgWebView.setOnClickListener {
+            loadArticleWebLink(blogArticleData[4])
+        }
+
         loadPageData()
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_share, menu)
@@ -57,12 +68,12 @@ class WebViewActivity: AppCompatActivity() {
 
 
     private fun loadPageData() {
-        val blogArticleData = intent.getStringArrayListExtra(ProjectData.putExtra_BlogWebView)
-
         //
         // Load the title.
         //
         this.titleData = blogArticleData[1]
+        this.urlLink = blogArticleData[4]
+
         val maxStringLength: Int = resources.getInteger(R.integer.title_maxlength)
         var currentPos=maxStringLength
         lateinit var tempTitle: String
@@ -93,6 +104,18 @@ class WebViewActivity: AppCompatActivity() {
         this.modDate="Posted Date: $modPostedDate"
         txtWebViewPostedDate.text = modDate
 
+
+        //
+        // Add the Article Web Link text to widget txtWebURLLink.
+        //
+        val linkText = "<a href='" + this.urlLink + "'>Article Web Link</a>"
+        txtWebURLLink.apply {
+            txtWebURLLink.setText(Html.fromHtml(linkText))
+            txtWebURLLink.setMovementMethod(LinkMovementMethod.getInstance());
+        }
+
+
+
         //
         // Load the image
         //
@@ -109,12 +132,11 @@ class WebViewActivity: AppCompatActivity() {
                 .into(imgWebView)
         }
 
-        // Load the URL Link
-        this.urlLink=blogArticleData[4]
 
-
+        //
         // Lastly, load the webview.
         // Note: WebView just needs the html from JSON...it automatically enters in the HTML header info.
+        //
         val htmlContext = blogArticleData[3]
 
         // Replaced webview.loadData with webview.loadDataWithBaseURL.  For some reason, this works better in converting HTML UTF chars.
@@ -146,5 +168,17 @@ class WebViewActivity: AppCompatActivity() {
         val day=modifiedDate.substring(monthPos+1,modifiedDate.length)
 
         return "$month/$day/$year"
+    }
+
+
+
+    private fun loadArticleWebLink(webURL: String) {
+        // Loads the webpage in browser.
+
+        val intent = Intent()
+        intent.action = Intent.ACTION_VIEW
+        intent.addCategory(Intent.CATEGORY_BROWSABLE)
+        intent.data = Uri.parse(webURL)
+        startActivity(intent)
     }
 }

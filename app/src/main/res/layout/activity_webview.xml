@@ -17,16 +17,30 @@
             android:paddingBottom="2dp">
         </ImageView>
 
+
         <TextView
             android:id="@+id/txtWebViewPostedDate"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/imgWebView"
-            android:hint="@string/posted_date_11_21_2018"
-            android:gravity="center_horizontal"
+            android:gravity="start"
             android:textSize="14sp"
             android:textStyle="italic"
-            android:paddingTop="4dp">
+            android:paddingTop="4dp"
+            android:paddingStart="50dp"
+            android:paddingEnd="150dp"
+            tools:text="@string/posted_date_11_21_2018">
+        </TextView>
+
+        <TextView
+            android:id="@+id/txtWebURLLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imgWebView"
+            android:layout_alignEnd="@id/txtWebViewPostedDate"
+            android:textSize="14sp"
+            android:textStyle="italic"
+            android:paddingTop="4dp" >
         </TextView>
 
         <WebView
