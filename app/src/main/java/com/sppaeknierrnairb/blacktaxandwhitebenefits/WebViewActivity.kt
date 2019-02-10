@@ -116,9 +116,10 @@ class WebViewActivity: AppCompatActivity() {
         // Lastly, load the webview.
         // Note: WebView just needs the html from JSON...it automatically enters in the HTML header info.
         val htmlContext = blogArticleData[3]
-        webview.loadData(htmlContext, "text/html; charset=UTF-8", null)
 
-
+        // Replaced webview.loadData with webview.loadDataWithBaseURL.  For some reason, this works better in converting HTML UTF chars.
+        webview.loadDataWithBaseURL(null, htmlContext, "text/html", "utf-8", null)
+        
         //
         // Changes Webview HTML text size!!
         //

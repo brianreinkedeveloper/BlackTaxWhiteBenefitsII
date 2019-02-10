@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity() {
                         val imageBlogURL = body[i].imageBlogURL
 
                         // Strips off some of the html codes that are not displaying correctly.
-                        title=parseTitle(title)
+                        title=convertUTFtoString(title)
 
                         // Adds to the recycler List DTO.
                         this@MainActivity.myList.add(
@@ -166,20 +166,6 @@ class MainActivity : AppCompatActivity() {
     private fun stopProgressBar() {
         progressBar1.visibility=View.INVISIBLE
     }
-
-
-    private fun parseTitle(title: String): String {
-        val titleMod: String
-
-        if (Build.VERSION.SDK_INT >= 24) {
-            titleMod= Html.fromHtml(title , Html.FROM_HTML_MODE_LEGACY).toString()
-        } else {
-            titleMod= Html.fromHtml(title).toString()
-        }
-
-        return titleMod
-    }
-
 
 
     private fun pageButtonsSaveState() {
@@ -228,5 +214,18 @@ class MainActivity : AppCompatActivity() {
             recyclerView.adapter=adapter
             recyclerView.layoutManager=llm
         }
+    }
+
+    private fun convertUTFtoString(title: String): String {
+        // Converts HTML UTF codes into readable string.
+        val convertedUTFString: String
+
+        if (Build.VERSION.SDK_INT >= 24) {
+            convertedUTFString= Html.fromHtml(title , Html.FROM_HTML_MODE_LEGACY).toString()
+        } else {
+            convertedUTFString= Html.fromHtml(title).toString()
+        }
+
+        return convertedUTFString
     }
 }
