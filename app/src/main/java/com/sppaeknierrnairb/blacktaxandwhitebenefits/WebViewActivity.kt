@@ -110,8 +110,8 @@ class WebViewActivity: AppCompatActivity() {
         //
         val linkText = "<a href='" + this.urlLink + "'>Article Web Link</a>"
         txtWebURLLink.apply {
-            txtWebURLLink.setText(Html.fromHtml(linkText))
-            txtWebURLLink.setMovementMethod(LinkMovementMethod.getInstance());
+            txtWebURLLink.text = Html.fromHtml(linkText)
+            txtWebURLLink.setMovementMethod(LinkMovementMethod.getInstance())
         }
 
 

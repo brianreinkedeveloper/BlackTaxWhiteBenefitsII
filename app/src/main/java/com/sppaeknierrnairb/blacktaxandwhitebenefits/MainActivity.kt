@@ -225,12 +225,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun convertUTFtoString(title: String): String {
         // Converts HTML UTF codes into readable string.
-        val convertedUTFString: String
-
-        if (Build.VERSION.SDK_INT >= 24) {
-            convertedUTFString= Html.fromHtml(title , Html.FROM_HTML_MODE_LEGACY).toString()
+        val convertedUTFString: String = if (Build.VERSION.SDK_INT >= 24) {
+            Html.fromHtml(title , Html.FROM_HTML_MODE_LEGACY).toString()
         } else {
-            convertedUTFString= Html.fromHtml(title).toString()
+            Html.fromHtml(title).toString()
         }
 
         return convertedUTFString
