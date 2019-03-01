@@ -12,6 +12,7 @@ object ProjectData {
 
     var onSavedState = false
     private const val htmlTextSizeDefault = 22
+
     // TODO: should be HTML_TEXT_SIZE_DEFAULT = 22
     var htmlTextSize = htmlTextSizeDefault
 
