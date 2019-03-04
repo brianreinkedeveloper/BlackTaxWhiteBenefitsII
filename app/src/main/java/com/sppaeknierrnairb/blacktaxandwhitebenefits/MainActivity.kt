@@ -3,35 +3,34 @@ package com.sppaeknierrnairb.blacktaxandwhitebenefits
 
 
 
-import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.text.Html
 import android.util.Log
 import android.view.View
+import androidx.work.*
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.BlogArticles
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.GetBlogService
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.RecycleDTO
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.RetrofitClientInstance
+import com.sppaeknierrnairb.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences
+import com.sppaeknierrnairb.blacktaxandwhitebenefits.WorkManager.BackgroundTask
+import com.sppaeknierrnairb.blacktaxandwhitebenefits.WorkManager.NOTIFICATION_WORKREQUEST_TAG
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
-
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
 
     // Retrofit service.
-    private val service = RetrofitClientInstance.retrofitInstance?.create(GetBlogService::class.java)
+//    private val service = RetrofitClientInstance.retrofitInstance?.create(GetBlogService::class.java)
     var myList = mutableListOf<RecycleDTO>()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 
         initialize()
         setupListeners()
@@ -39,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         //
         // RetrofitClientInstance
         //
-        runEnqueue(service, ProjectData.currentPage)
+        runEnqueue(ProjectData.currentPage)
 
     }
 
@@ -60,6 +59,24 @@ class MainActivity : AppCompatActivity() {
             butPagePrev.isEnabled=false
         }
         pageButtonsSaveState()
+        initBackgroundTask()
+
+        // Reads in existing shared preferences.
+        AppSharedPreferences.sharedPrefNotificationTitle = AppSharedPreferences.getAppSharedPreferences(this, AppSharedPreferences.SHAREDPREF_BLOGTITLE)
+    }
+
+
+    private fun initBackgroundTask() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val periodicWork = PeriodicWorkRequest.Builder(BackgroundTask::class.java, 15, TimeUnit.MINUTES)
+            .addTag(NOTIFICATION_WORKREQUEST_TAG)
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance().enqueueUniquePeriodicWork(NOTIFICATION_WORKREQUEST_TAG, ExistingPeriodicWorkPolicy.KEEP, periodicWork)
     }
 
 
@@ -110,14 +127,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun preparePage(currentPage: Int) {
         myList.clear()
-        runEnqueue(service, currentPage)
+        runEnqueue(currentPage)
     }
 
 
-    private fun runEnqueue(service: GetBlogService?, currentPage: Int = 1)  {
+    private fun runEnqueue(currentPage: Int = 1)  {
         progressBar1.visibility=View.VISIBLE
 
-        val call = service?.getAllArticles(currentPage.toString())
+        val call = BackgroundTask.getArticleResponseCall(currentPage)
+
         call?.enqueue(object : Callback<List<BlogArticles>> {
             override fun onResponse(call: Call<List<BlogArticles>>, response: Response<List<BlogArticles>>) {
                 // Retrofit succeeded to get networking and is hitting main url.
@@ -137,7 +155,10 @@ class MainActivity : AppCompatActivity() {
                         val imageBlogURL = body[i].imageBlogURL
 
                         // Strips off some of the html codes that are not displaying correctly.
-                        title=convertUTFtoString(title)
+                        title=BackgroundTask.convertUTFtoString(title)
+
+                        Log.i("!!!", "Title of blog 0 article: $title")
+                        Log.i("!!!", "Date of blog 0 article: $modifiedDate")
 
                         // Adds to the recycler List DTO.
                         this@MainActivity.myList.add(
@@ -221,16 +242,5 @@ class MainActivity : AppCompatActivity() {
             recyclerView.adapter=adapter
             recyclerView.layoutManager=llm
         }
-    }
-
-    private fun convertUTFtoString(title: String): String {
-        // Converts HTML UTF codes into readable string.
-        val convertedUTFString: String = if (Build.VERSION.SDK_INT >= 24) {
-            Html.fromHtml(title , Html.FROM_HTML_MODE_LEGACY).toString()
-        } else {
-            Html.fromHtml(title).toString()
-        }
-
-        return convertedUTFString
     }
 }
