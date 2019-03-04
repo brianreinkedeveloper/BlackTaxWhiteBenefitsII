@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val periodicWork = PeriodicWorkRequest.Builder(BackgroundTask::class.java, 15, TimeUnit.MINUTES)
+        val periodicWork = PeriodicWorkRequest.Builder(BackgroundTask::class.java, 8, TimeUnit.HOURS)
             .addTag(NOTIFICATION_WORKREQUEST_TAG)
             .setConstraints(constraints)
             .build()

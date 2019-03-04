@@ -11,15 +11,17 @@ import android.text.Html
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.MainActivity
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.BlogArticles
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.GetBlogService
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.RetrofitClientInstance
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences
+import com.sppaeknierrnairb.blacktaxandwhitebenefits.ProjectData
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.R
+import com.sppaeknierrnairb.blacktaxandwhitebenefits.WebViewActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 
 
 // notifications constants
@@ -30,12 +32,13 @@ const val CHANNEL_NAME = "notificationbackgroundtask"
 // WorkManager constants
 const val NOTIFICATION_WORKREQUEST_TAG = "NOTIFICATION_WORKREQUEST_TAG"
 
+private var webViewDataArray = ArrayList<String>(4)
+
 class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     override fun doWork(): Result {
         // Worker gets called immediately upon WorkRequest setup.  Therefore, we may want to set an initial delay.
 
         checkForUpdatedBlogs()
-
         return Result.success()
     }
 
@@ -62,21 +65,26 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
 
                     // We only want the first article to see if it's newer than what we have already.
                     for (i in 0..0) {
-                        var title = body[i].title.titleRendered
-                        val urlLink = body[i].URLLink
-                        val date = body[i].date
-                        val id = body[i].id
-                        val modifiedDate = body[i].modifiedDate
-                        val htmlArticle = body[i].content.htmlRendered
-                        val imageBlogURL = body[i].imageBlogURL
+                        var blogTitle = body[i].title.titleRendered
+                        val blogUrlLink = body[i].URLLink
+                        val blogDate = body[i].date
+                        val blogHtmlArticle = body[i].content.htmlRendered
+                        val blogImageBlogURL = body[i].imageBlogURL
+                        val blogID = body[i].id
+                        val blogModifiedDate = body[i].modifiedDate
 
                         // Strips off some of the html codes that are not displaying correctly.
-                        title=convertUTFtoString(title)
-                        Log.i("!!!SharedPref", "Title of blog 0 article: $title")
-                        Log.i("!!!SharedPref", "Date of blog 0 article: $title")
+                        blogTitle=convertUTFtoString(blogTitle)
+
+                        webViewDataArray = ArrayList<String>(4)
+                        webViewDataArray.add(0, blogDate)
+                        webViewDataArray.add(1, blogTitle)
+                        webViewDataArray.add(2, blogImageBlogURL)
+                        webViewDataArray.add(3, blogHtmlArticle)
+                        webViewDataArray.add(4, blogUrlLink)
 
                         // Saves title shared preference if title is newer.
-                        detNewerSharedPreferences(title)
+                        detNewerSharedPreferences(blogTitle)
                     }
                 } else {
                     // no data in query.
@@ -120,8 +128,8 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
     /*
 //TODO: sendNotification as it is has two issues:
     1) It sends an intent to simply open MainActivity. This causes MainActivity.onCreate() to get triggered which calls
-       a variety of one-time processes!!
-    2) When the user clicks on the notification, it should go directly to the article!
+       a variety of one-time processes!! --> Fixed.
+    2) When the user clicks on the notification, it should go directly to the article! --> Done.
 */
    private fun sendNotification(title: String, message: String) {
        val appContext = applicationContext
@@ -135,12 +143,19 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
        }
 
        val notification = NotificationCompat.Builder(appContext, CHANNEL_ID_STR).apply {
-           val intent = Intent(appContext, MainActivity::class.java)
-           val pendingIntent: PendingIntent = PendingIntent.getActivity(appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-            setContentTitle(title)
-            setContentText(message)
-            setContentIntent(pendingIntent)
-            setSmallIcon(R.mipmap.ic_launcher)
+           // Sets up our intent to open to the article page directly.
+           val intent = Intent(appContext, WebViewActivity::class.java)
+
+           // pass data into our intent.
+           intent.putStringArrayListExtra(ProjectData.putExtra_BlogWebView, webViewDataArray)
+
+           // Opens the page.
+           val pendingIntent = PendingIntent.getActivity(appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+           setContentTitle(title)
+           setContentText(message)
+           setContentIntent(pendingIntent)
+           setSmallIcon(R.mipmap.ic_launcher)
+           setAutoCancel(true)
        }
 
        notificationManager.notify(CHANNEL_ID, notification.build())
@@ -153,7 +168,6 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
         fun getArticleResponseCall(pageNum: Int): Call<List<BlogArticles>>? {
             val service = RetrofitClientInstance.retrofitInstance?.create(GetBlogService::class.java)
 
-//        Log.d(TAG, "articleResponseCall url:" + articleResponseCall.request().url().toString())
             return service?.getAllArticles(pageNum.toString())
         }
 
