@@ -154,7 +154,7 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
            setContentTitle(title)
            setContentText(message)
            setContentIntent(pendingIntent)
-           setSmallIcon(R.mipmap.ic_launcher)
+           setSmallIcon(R.mipmap.ic_stat_handshake)
            setAutoCancel(true)
        }
 

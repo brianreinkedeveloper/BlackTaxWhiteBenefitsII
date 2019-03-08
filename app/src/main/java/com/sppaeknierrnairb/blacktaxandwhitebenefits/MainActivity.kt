@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         initBackgroundTask()
 
         // Reads in existing shared preferences.
-        AppSharedPreferences.sharedPrefNotificationTitle = AppSharedPreferences.getAppSharedPreferences(this, AppSharedPreferences.SHAREDPREF_BLOGTITLE)
+        AppSharedPreferences.sharedPrefNotificationTitle = AppSharedPreferences.getAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE)
     }
 
 
@@ -157,9 +157,6 @@ class MainActivity : AppCompatActivity() {
                         // Strips off some of the html codes that are not displaying correctly.
                         title=BackgroundTask.convertUTFtoString(title)
 
-                        Log.i("!!!", "Title of blog 0 article: $title")
-                        Log.i("!!!", "Date of blog 0 article: $modifiedDate")
-
                         // Adds to the recycler List DTO.
                         this@MainActivity.myList.add(
                             i,
@@ -167,7 +164,6 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
 
-                    Log.i("!!!", this@MainActivity.myList[0].title)
                     displayData(this@MainActivity.myList)
                     pageButtonsRestoreState()
                     stopProgressBar()
