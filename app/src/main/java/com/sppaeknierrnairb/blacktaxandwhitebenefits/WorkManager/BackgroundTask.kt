@@ -5,6 +5,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.support.v4.app.NotificationCompat
 import android.text.Html
@@ -18,9 +20,12 @@ import com.sppaeknierrnairb.blacktaxandwhitebenefits.ObjectEnumClasses.AppShared
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.ProjectData
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.R
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.WebViewActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.net.URL
 import java.util.*
 
 
@@ -32,7 +37,8 @@ const val CHANNEL_NAME = "notificationbackgroundtask"
 // WorkManager constants
 const val NOTIFICATION_WORKREQUEST_TAG = "NOTIFICATION_WORKREQUEST_TAG"
 
-private var webViewDataArray = ArrayList<String>(4)
+private var backgroundTaskDataArray = ArrayList<String>(4)
+
 
 class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     override fun doWork(): Result {
@@ -69,59 +75,62 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
                         val blogUrlLink = body[i].URLLink
                         val blogDate = body[i].date
                         val blogHtmlArticle = body[i].content.htmlRendered
-                        val blogImageBlogURL = body[i].imageBlogURL
+                        var blogImageBlogURL = body[i].imageBlogURL         //change back to val!
                         val blogID = body[i].id
                         val blogModifiedDate = body[i].modifiedDate
 
                         // Strips off some of the html codes that are not displaying correctly.
                         blogTitle=convertUTFtoString(blogTitle)
 
-                        webViewDataArray = ArrayList<String>(4)
-                        webViewDataArray.add(0, blogDate)
-                        webViewDataArray.add(1, blogTitle)
-                        webViewDataArray.add(2, blogImageBlogURL)
-                        webViewDataArray.add(3, blogHtmlArticle)
-                        webViewDataArray.add(4, blogUrlLink)
+                        backgroundTaskDataArray = ArrayList<String>(4)
+                        backgroundTaskDataArray.add(0, blogDate)
+                        backgroundTaskDataArray.add(1, blogTitle)
+                        backgroundTaskDataArray.add(2, blogImageBlogURL)
+                        backgroundTaskDataArray.add(3, blogHtmlArticle)
+                        backgroundTaskDataArray.add(4, blogUrlLink)
 
-                        // Saves title shared preference if title is newer.
-                        detNewerSharedPreferences(blogTitle)
+                        /*  detNewerSharedPreferences Does two things:
+                            1) If blogtitle is newer than the saved title in sharedpref, then save the newer value.
+                            2) Returns the previous shared pref title.
+                         */
+                        val previousSharedPrefTitle = detNewerSharedPreferences(blogTitle)
+
+                        if (previousSharedPrefTitle != "") {
+                            // We don't want the WorkManager notification to come up on a newly-installed app--only on subsequent new articles!
+                            // Because we have a newer title, make sure user can see it!
+                            val appName = applicationContext.resources.getString(R.string.app_name)
+                            sendNotification(appName, "A new article was found--$blogTitle", blogImageBlogURL)
+                        }
                     }
                 } else {
-                    // no data in query.
-                    if (response.code() == 400) {
-                        // Thankfully, the recyclerView doesn't fail here.
-                        Log.i("!!!", "query is not found in retrofit!!")
-                    }
+                    // Do nothing because this is just a periodic background method....not critical.
                 }
             }
 
             override fun onFailure(call: Call<List<BlogArticles>>, t: Throwable) {
                 // No network or cannot get to URL.
-                Log.i("!!!", "retrofit failed!")
+                // Do nothing because this is just a periodic background method....not critical.
             }
         })
     }
 
 
-    private fun detNewerSharedPreferences(blogTitle: String) {
+    private fun detNewerSharedPreferences(blogTitle: String): String {
         // Saves title only if it's different...keep in mind that we're only comparing differences in the first record,
         //   which is the record being uploaded.
-        val previousSharedPrefTitle = AppSharedPreferences.sharedPrefNotificationTitle
 
-        if (AppSharedPreferences.sharedPrefNotificationTitle != blogTitle) {
+        // To make this determination, we need to know what the old SharedPref blogtitle is.
+        var currentSharedPref = AppSharedPreferences.getAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE)
+
+        // Looks to compare to see if we have a newer blogtitle or not.
+        if (currentSharedPref != "" && currentSharedPref != blogTitle) {
             // Save the newest blog article to our SharedPref variable.
             AppSharedPreferences.setAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE,
-                blogTitle
-            )
-            AppSharedPreferences.sharedPrefNotificationTitle = blogTitle
-
-            if (previousSharedPrefTitle !="") {
-                // We don't want the WorkManager notification to come up on a newly-installed app--only on subsequent new articles!
-                // Because we have a newer title, make sure user can see it!
-                val appName = applicationContext.resources.getString(R.string.app_name)
-                sendNotification(appName, "A new article was found--$blogTitle")
-            }
+                blogTitle)
+            currentSharedPref = blogTitle
         }
+
+        return currentSharedPref
     }
 
 
@@ -131,7 +140,7 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
        a variety of one-time processes!! --> Fixed.
     2) When the user clicks on the notification, it should go directly to the article! --> Done.
 */
-   private fun sendNotification(title: String, message: String) {
+   private fun sendNotification(title: String, message: String, urlImagePath: String) {
        val appContext = applicationContext
 
        val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -142,23 +151,64 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
            notificationManager.createNotificationChannel(channel)
        }
 
-       val notification = NotificationCompat.Builder(appContext, CHANNEL_ID_STR).apply {
-           // Sets up our intent to open to the article page directly.
-           val intent = Intent(appContext, WebViewActivity::class.java)
+       // Get's image drawable for large icon.
+       val bitmap: Bitmap? = getBitmapFromURL(urlImagePath)
 
-           // pass data into our intent.
-           intent.putStringArrayListExtra(ProjectData.putExtra_BlogWebView, webViewDataArray)
+        if (bitmap != null) {
+            val notification = NotificationCompat.Builder(appContext, CHANNEL_ID_STR).apply {
+                // Sets up our intent to open to the article page directly.
+                val intent = Intent(appContext, WebViewActivity::class.java)
 
-           // Opens the page.
-           val pendingIntent = PendingIntent.getActivity(appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-           setContentTitle(title)
-           setContentText(message)
-           setContentIntent(pendingIntent)
-           setSmallIcon(R.mipmap.ic_stat_handshake)
-           setAutoCancel(true)
-       }
+                // pass data into our intent.
+                intent.putStringArrayListExtra(ProjectData.putExtra_BlogWebView, backgroundTaskDataArray)
 
-       notificationManager.notify(CHANNEL_ID, notification.build())
+                // Intent in case the user clicks on the article.
+                val pendingIntent = PendingIntent.getActivity(appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                setContentTitle(title)
+                setContentText(message)
+                setContentIntent(pendingIntent)
+                setLargeIcon(bitmap)
+
+                // On API >= 21, image must be PNG and transparent.  It helps to be a clear solid image or outlined image.
+                setSmallIcon(com.sppaeknierrnairb.blacktaxandwhitebenefits.R.drawable.ic_stat_handshake)
+                setAutoCancel(true)
+            }
+            notificationManager.notify(CHANNEL_ID, notification.build())
+        } else {
+            // No bitmap for setlargeIcon
+            val notification = NotificationCompat.Builder(appContext, CHANNEL_ID_STR).apply {
+                // Sets up our intent to open to the article page directly.
+                val intent = Intent(appContext, WebViewActivity::class.java)
+
+                // Intent in case the user clicks on the article.
+                val pendingIntent = PendingIntent.getActivity(appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                setContentTitle(title)
+                setContentText(message)
+                setContentIntent(pendingIntent)
+
+                // On API >= 21, image must be PNG and transparent.  It helps to be a clear solid image or outlined image.
+                setSmallIcon(com.sppaeknierrnairb.blacktaxandwhitebenefits.R.drawable.ic_stat_handshake)
+                setAutoCancel(true)
+            }
+            notificationManager.notify(CHANNEL_ID, notification.build())
+        }
+    }
+
+
+    fun getBitmapFromURL(imageURL: String): Bitmap? {
+        // Goes until its done loading (synchronous)
+        val bitmap = runBlocking (Dispatchers.IO) {
+            var bmp: Bitmap? = null
+            try {
+                bmp = BitmapFactory.decodeStream(URL(imageURL).openStream())
+            } catch (e: Exception) {
+                Log.e("Error", e.message.toString())
+                e.printStackTrace()
+            }
+
+            bmp
+        }
+        return bitmap
     }
 
 

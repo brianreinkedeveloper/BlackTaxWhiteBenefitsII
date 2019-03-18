@@ -8,10 +8,6 @@ object AppSharedPreferences {
     const val SHAREDPREFFILE = "BLACKTAXWHITEBENEFITS_SHAREDPREF_FILE"
     const val SHAREDPREF_BLOGTITLE = "SHAREDPREF_BLOGTITLE"
 
-    // saved values
-    var sharedPrefNotificationTitle: String = ""
-
-
     // Gets app Shared Preferences
     fun setAppSharedPreferences(context: Context, prefvar: String, getSetValue: String) {
         context.getSharedPreferences(SHAREDPREFFILE, MODE_PRIVATE).edit().apply {

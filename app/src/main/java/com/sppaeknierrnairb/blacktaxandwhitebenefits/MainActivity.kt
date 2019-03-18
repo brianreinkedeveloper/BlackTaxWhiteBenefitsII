@@ -11,7 +11,6 @@ import android.view.View
 import androidx.work.*
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.BlogArticles
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.RecycleDTO
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.WorkManager.BackgroundTask
 import com.sppaeknierrnairb.blacktaxandwhitebenefits.WorkManager.NOTIFICATION_WORKREQUEST_TAG
 import kotlinx.android.synthetic.main.activity_main.*
@@ -60,9 +59,6 @@ class MainActivity : AppCompatActivity() {
         }
         pageButtonsSaveState()
         initBackgroundTask()
-
-        // Reads in existing shared preferences.
-        AppSharedPreferences.sharedPrefNotificationTitle = AppSharedPreferences.getAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE)
     }
 
 
@@ -71,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val periodicWork = PeriodicWorkRequest.Builder(BackgroundTask::class.java, 8, TimeUnit.HOURS)
+        val periodicWork = PeriodicWorkRequest.Builder(BackgroundTask::class.java, 15, TimeUnit.MINUTES)
             .addTag(NOTIFICATION_WORKREQUEST_TAG)
             .setConstraints(constraints)
             .build()
