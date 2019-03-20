@@ -67,12 +67,12 @@ class MainActivity : AppCompatActivity() {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val periodicWork = PeriodicWorkRequest.Builder(BackgroundTask::class.java, 15, TimeUnit.MINUTES)
+        val periodicWork = PeriodicWorkRequest.Builder(BackgroundTask::class.java, 12, TimeUnit.HOURS)
             .addTag(NOTIFICATION_WORKREQUEST_TAG)
             .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance().enqueueUniquePeriodicWork(NOTIFICATION_WORKREQUEST_TAG, ExistingPeriodicWorkPolicy.KEEP, periodicWork)
+        WorkManager.getInstance().enqueueUniquePeriodicWork(NOTIFICATION_WORKREQUEST_TAG, ExistingPeriodicWorkPolicy.REPLACE, periodicWork)
     }
 
 

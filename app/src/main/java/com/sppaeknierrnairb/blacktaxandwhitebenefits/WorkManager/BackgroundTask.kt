@@ -90,8 +90,8 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
                         backgroundTaskDataArray.add(4, blogUrlLink)
 
                         /*  detNewerSharedPreferences Does two things:
-                            1) If blogtitle is newer than the saved title in sharedpref, then save the newer value.
-                            2) Returns the previous shared pref title.
+                            1) If blogtitle is different than the saved title in sharedpref, then save the newer value to SharedPrefs right away!
+                            2) Returns the newest blog title assigned to SharedPref.
                          */
                         val previousSharedPrefTitle = detNewerSharedPreferences(blogTitle)
 
@@ -104,12 +104,14 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
                     }
                 } else {
                     // Do nothing because this is just a periodic background method....not critical.
+                    Log.e("!!!", "Background Task: Retrofit response was unsuccessful!")
                 }
             }
 
             override fun onFailure(call: Call<List<BlogArticles>>, t: Throwable) {
                 // No network or cannot get to URL.
                 // Do nothing because this is just a periodic background method....not critical.
+                Log.e("!!!", "Background Task: Hit onFailure() method. Bad URL or network connection!")
             }
         })
     }
@@ -119,18 +121,20 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
         // Saves title only if it's different...keep in mind that we're only comparing differences in the first record,
         //   which is the record being uploaded.
 
+        // blogTitle --> The most recent article downloaded via WorkManager from the endpoint.
+
         // To make this determination, we need to know what the old SharedPref blogtitle is.
-        var currentSharedPref = AppSharedPreferences.getAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE)
+        var currentSharedPrefTitle = AppSharedPreferences.getAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE)
 
         // Looks to compare to see if we have a newer blogtitle or not.
-        if (currentSharedPref != "" && currentSharedPref != blogTitle) {
+        if (blogTitle != "" && currentSharedPrefTitle != blogTitle) {
             // Save the newest blog article to our SharedPref variable.
             AppSharedPreferences.setAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE,
                 blogTitle)
-            currentSharedPref = blogTitle
+            currentSharedPrefTitle = blogTitle
         }
 
-        return currentSharedPref
+        return currentSharedPrefTitle
     }
 
 
@@ -155,6 +159,7 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
        val bitmap: Bitmap? = getBitmapFromURL(urlImagePath)
 
         if (bitmap != null) {
+            // Show largeIcon
             val notification = NotificationCompat.Builder(appContext, CHANNEL_ID_STR).apply {
                 // Sets up our intent to open to the article page directly.
                 val intent = Intent(appContext, WebViewActivity::class.java)
@@ -170,7 +175,7 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
                 setLargeIcon(bitmap)
 
                 // On API >= 21, image must be PNG and transparent.  It helps to be a clear solid image or outlined image.
-                setSmallIcon(com.sppaeknierrnairb.blacktaxandwhitebenefits.R.drawable.ic_stat_handshake)
+                setSmallIcon(R.drawable.ic_stat_handshake)
                 setAutoCancel(true)
             }
             notificationManager.notify(CHANNEL_ID, notification.build())
@@ -187,7 +192,7 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
                 setContentIntent(pendingIntent)
 
                 // On API >= 21, image must be PNG and transparent.  It helps to be a clear solid image or outlined image.
-                setSmallIcon(com.sppaeknierrnairb.blacktaxandwhitebenefits.R.drawable.ic_stat_handshake)
+                setSmallIcon(R.drawable.ic_stat_handshake)
                 setAutoCancel(true)
             }
             notificationManager.notify(CHANNEL_ID, notification.build())
@@ -202,8 +207,7 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
             try {
                 bmp = BitmapFactory.decodeStream(URL(imageURL).openStream())
             } catch (e: Exception) {
-                Log.e("Error", e.message.toString())
-                e.printStackTrace()
+                Log.e("!!!", "getBitmapFromURL: " + e.message.toString())
             }
 
             bmp

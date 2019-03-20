@@ -17,6 +17,7 @@ object AppSharedPreferences {
     }
 
     fun getAppSharedPreferences(context: Context, prefvar: String): String {
+        // If shared preference is not found assign an empty string.
         val valueFromSharedPref = context.getSharedPreferences(SHAREDPREFFILE, MODE_PRIVATE)
             .getString(prefvar, "")
         return valueFromSharedPref
