@@ -1,4 +1,4 @@
-package com.sppaeknierrnairb.blacktaxandwhitebenefits.WorkManager
+package com.blacktaxandwhitebenefits.WorkManager
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -13,13 +13,13 @@ import android.text.Html
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.BlogArticles
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.GetBlogService
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.RetrofitClientInstance
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.ProjectData
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.R
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.WebViewActivity
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.BlogArticles
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.GetBlogService
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.RetrofitClientInstance
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences
+import com.blacktaxandwhitebenefits.ProjectData
+import com.blacktaxandwhitebenefits.R
+import com.blacktaxandwhitebenefits.WebViewActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import retrofit2.Call
@@ -54,7 +54,10 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
 
         // Make a Retrofit call to query the blogs.
         // We're only getting the first page's data...why?  Because any new blogs will be on the first page.
-        val call = BackgroundTask.getArticleResponseCall(1)
+        val call =
+            getArticleResponseCall(
+                1
+            )
 
         //
         // We're not interested in actually updating RecyclerView.  If we detect new articles, then just
@@ -80,7 +83,10 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
                         val blogModifiedDate = body[i].modifiedDate
 
                         // Strips off some of the html codes that are not displaying correctly.
-                        blogTitle=convertUTFtoString(blogTitle)
+                        blogTitle=
+                            convertUTFtoString(
+                                blogTitle
+                            )
 
                         backgroundTaskDataArray = ArrayList<String>(4)
                         backgroundTaskDataArray.add(0, blogDate)
@@ -165,7 +171,9 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
 
        //If on Oreo then notification required a notification channel.
        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-           val channel = NotificationChannel(CHANNEL_ID_STR, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
+           val channel = NotificationChannel(
+               CHANNEL_ID_STR,
+               CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
            notificationManager.createNotificationChannel(channel)
        }
 
@@ -174,12 +182,17 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
 
         if (bitmap != null) {
             // Show largeIcon
-            val notification = NotificationCompat.Builder(appContext, CHANNEL_ID_STR).apply {
+            val notification = NotificationCompat.Builder(appContext,
+                CHANNEL_ID_STR
+            ).apply {
                 // Sets up our intent to open to the article page directly.
                 val intent = Intent(appContext, WebViewActivity::class.java)
 
                 // pass data into our intent.
-                intent.putStringArrayListExtra(ProjectData.putExtra_BlogWebView, backgroundTaskDataArray)
+                intent.putStringArrayListExtra(
+                    ProjectData.putExtra_BlogWebView,
+                    backgroundTaskDataArray
+                )
 
                 // Intent in case the user clicks on the article.
                 val pendingIntent = PendingIntent.getActivity(appContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -195,7 +208,9 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
             notificationManager.notify(CHANNEL_ID, notification.build())
         } else {
             // No bitmap for setlargeIcon
-            val notification = NotificationCompat.Builder(appContext, CHANNEL_ID_STR).apply {
+            val notification = NotificationCompat.Builder(appContext,
+                CHANNEL_ID_STR
+            ).apply {
                 // Sets up our intent to open to the article page directly.
                 val intent = Intent(appContext, WebViewActivity::class.java)
 
@@ -234,7 +249,8 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
     companion object {
         // Returns static fields / methods.
         fun getArticleResponseCall(pageNum: Int): Call<List<BlogArticles>>? {
-            val service = RetrofitClientInstance.retrofitInstance?.create(GetBlogService::class.java)
+            val service = RetrofitClientInstance.retrofitInstance?.create(
+                GetBlogService::class.java)
 
             return service?.getAllArticles(pageNum.toString())
         }

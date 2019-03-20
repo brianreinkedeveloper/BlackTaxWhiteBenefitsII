@@ -1,4 +1,4 @@
-package com.sppaeknierrnairb.blacktaxandwhitebenefits
+package com.blacktaxandwhitebenefits
 
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule

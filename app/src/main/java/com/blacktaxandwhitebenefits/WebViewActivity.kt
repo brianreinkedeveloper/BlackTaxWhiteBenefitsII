@@ -1,4 +1,4 @@
-package com.sppaeknierrnairb.blacktaxandwhitebenefits
+package com.blacktaxandwhitebenefits
 
 import android.content.Intent
 import android.net.Uri
@@ -9,6 +9,7 @@ import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.view.MenuItem
 import android.webkit.WebSettings
+import com.blacktaxandwhitebenefits.R
 import kotlinx.android.synthetic.main.activity_webview.*
 
 
@@ -120,14 +121,12 @@ class WebViewActivity: AppCompatActivity() {
         // Load the image
         //
         if (blogArticleData[2] != "") {
-            GlideApp
-                .with(this)
+            GlideApp.with(this)
                 .load(blogArticleData[2])
                 .into(imgWebView)
         } else {
             // Load default image.
-            GlideApp
-                .with(this)
+            GlideApp.with(this)
                 .load(R.drawable.no_image)
                 .into(imgWebView)
         }

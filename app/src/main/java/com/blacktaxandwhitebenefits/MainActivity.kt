@@ -1,4 +1,4 @@
-package com.sppaeknierrnairb.blacktaxandwhitebenefits
+package com.blacktaxandwhitebenefits
 
 
 
@@ -9,10 +9,10 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import androidx.work.*
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.BlogArticles
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.RecycleDTO
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.WorkManager.BackgroundTask
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.WorkManager.NOTIFICATION_WORKREQUEST_TAG
+import com.blacktaxandwhitebenefits.WorkManager.BackgroundTask
+import com.blacktaxandwhitebenefits.WorkManager.NOTIFICATION_WORKREQUEST_TAG
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.BlogArticles
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.RecycleDTO
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle?) {
         // For some reason, this doesn't work if outPersistentState exists!
         super.onSaveInstanceState(outState)
-        ProjectData.onSavedState=true
+        ProjectData.onSavedState =true
     }
 
 
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         butPagePrev.setOnClickListener {
-            ProjectData.buttonClicked="prev"
+            ProjectData.buttonClicked ="prev"
 
             // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
             recyclerView.visibility=View.INVISIBLE
@@ -88,19 +88,19 @@ class MainActivity : AppCompatActivity() {
             butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
 
             ProjectData.currentPage--
-            if (ProjectData.currentPage==1) {
+            if (ProjectData.currentPage ==1) {
                 butPagePrev.isEnabled = false
-                ProjectData.butPrevPageState=false
+                ProjectData.butPrevPageState =false
             } else{
                 butPagePrev.isEnabled = true
-                ProjectData.butNextPageState=butPageNext.isEnabled
+                ProjectData.butNextPageState =butPageNext.isEnabled
             }
             preparePage(ProjectData.currentPage)
         }
 
         butPageNext.setOnClickListener {
             // We turn it off until network load is finished.
-            ProjectData.buttonClicked="next"
+            ProjectData.buttonClicked ="next"
             butPageNext.isEnabled=false
 
             // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
@@ -111,9 +111,9 @@ class MainActivity : AppCompatActivity() {
             butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
 
             ProjectData.currentPage++
-            if (ProjectData.currentPage==ProjectData.maxPagesAtCompile) {
+            if (ProjectData.currentPage == ProjectData.maxPagesAtCompile) {
                 butPageNext.isEnabled = false
-                ProjectData.butNextPageState=butPageNext.isEnabled
+                ProjectData.butNextPageState =butPageNext.isEnabled
             }
 
             preparePage(ProjectData.currentPage)
@@ -151,12 +151,20 @@ class MainActivity : AppCompatActivity() {
                         val imageBlogURL = body[i].imageBlogURL
 
                         // Strips off some of the html codes that are not displaying correctly.
-                        title=BackgroundTask.convertUTFtoString(title)
+                        title= BackgroundTask.convertUTFtoString(title)
 
                         // Adds to the recycler List DTO.
                         this@MainActivity.myList.add(
                             i,
-                            RecycleDTO(title, urlLink, date, id, modifiedDate, htmlArticle, imageBlogURL)
+                            RecycleDTO(
+                                title,
+                                urlLink,
+                                date,
+                                id,
+                                modifiedDate,
+                                htmlArticle,
+                                imageBlogURL
+                            )
                         )
                     }
 
@@ -209,13 +217,13 @@ class MainActivity : AppCompatActivity() {
         // Restore button states
         if (ProjectData.currentPage > 1) {
             butPagePrev.isEnabled=true
-            ProjectData.butPrevPageState=butPagePrev.isEnabled
+            ProjectData.butPrevPageState =butPagePrev.isEnabled
             butPagePrev.setBackgroundColor(resources.getColor(R.color.colorSecondaryLight))
             butPageNext.setBackgroundColor(resources.getColor(R.color.colorSecondaryLight))
         }
         if (ProjectData.currentPage < ProjectData.maxPages) {
             butPageNext.isEnabled=true
-            ProjectData.butPrevPageState=butPageNext.isEnabled
+            ProjectData.butPrevPageState =butPageNext.isEnabled
             butPageNext.setBackgroundColor(resources.getColor(R.color.colorSecondaryLight))
         }
         if (ProjectData.currentPage == ProjectData.maxPages) {

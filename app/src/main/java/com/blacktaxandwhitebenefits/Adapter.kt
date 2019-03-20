@@ -1,4 +1,4 @@
-package com.sppaeknierrnairb.blacktaxandwhitebenefits
+package com.blacktaxandwhitebenefits
 
 import android.content.Context
 import android.content.Intent
@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.sppaeknierrnairb.blacktaxandwhitebenefits.Networking.RecycleDTO
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.RecycleDTO
 import kotlinx.android.synthetic.main.recycle_item.view.*
 import java.util.*
 
@@ -25,22 +25,20 @@ class Adapter(val myList: MutableList<RecycleDTO>): RecyclerView.Adapter<Adapter
         return myList.size
     }
 
-    override fun onBindViewHolder(holder: Adapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.titleView.text = myList[position].title
 
 
         // Note: Image URL cannot be null.
         // URL can be a non-existant URL but does need to be something.
         if (myList[position].imageBlogURL != "") {
-            GlideApp
-                .with(this.adapterContext)
+            GlideApp.with(this.adapterContext)
                 .load(myList[position].imageBlogURL)
                 .into(holder.imageView)
 
         } else {
             // Load default image.
-            GlideApp
-                .with(this.adapterContext)
+            GlideApp.with(this.adapterContext)
                 .load(R.drawable.no_image)
                 .into(holder.imageView)
         }

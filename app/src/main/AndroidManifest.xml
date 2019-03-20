@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:dist="http://schemas.android.com/apk/distribution"
           xmlns:tools="http://schemas.android.com/tools"
-          package="com.sppaeknierrnairb.blacktaxandwhitebenefits"
+          package="com.blacktaxandwhitebenefits"
           tools:ignore="GoogleAppIndexingWarning">
 
     <uses-permission android:name="android.permission.INTERNET"
@@ -21,7 +21,7 @@
             android:supportsRtl="false"
             android:theme="@style/AppTheme"
             android:fullBackupContent="@xml/backup_descriptor">
-        <activity android:name="com.sppaeknierrnairb.blacktaxandwhitebenefits.MainActivity"
+        <activity android:name="com.blacktaxandwhitebenefits.MainActivity"
                   android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"
@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.sppaeknierrnairb.blacktaxandwhitebenefits.WebViewActivity"
+        <activity android:name="com.blacktaxandwhitebenefits.WebViewActivity"
                   android:label="Blog Item"
                   android:screenOrientation="portrait"
         >
