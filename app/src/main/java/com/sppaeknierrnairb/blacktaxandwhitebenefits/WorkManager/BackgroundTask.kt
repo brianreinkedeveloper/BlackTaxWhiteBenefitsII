@@ -75,7 +75,7 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
                         val blogUrlLink = body[i].URLLink
                         val blogDate = body[i].date
                         val blogHtmlArticle = body[i].content.htmlRendered
-                        var blogImageBlogURL = body[i].imageBlogURL         //change back to val!
+                        val blogImageBlogURL = body[i].imageBlogURL
                         val blogID = body[i].id
                         val blogModifiedDate = body[i].modifiedDate
 
@@ -93,11 +93,15 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
                             1) If blogtitle is different than the saved title in sharedpref, then save the newer value to SharedPrefs right away!
                             2) Returns the newest blog title assigned to SharedPref.
                          */
-                        val previousSharedPrefTitle = detNewerSharedPreferences(blogTitle)
+                        val possibleNewSharedPrefTitle = detNewerSharedPreferences(blogTitle)
 
-                        if (previousSharedPrefTitle != "") {
-                            // We don't want the WorkManager notification to come up on a newly-installed app--only on subsequent new articles!
+                        if (possibleNewSharedPrefTitle != "") {
+                            /*
+                               We don't want the WorkManager notification to come up:
+                                  * On a newly-installed app--work manager runs as soon as the app is installed.
+                                  * When articles haven't changed.
                             // Because we have a newer title, make sure user can see it!
+                            */
                             val appName = applicationContext.resources.getString(R.string.app_name)
                             sendNotification(appName, "A new article was found--$blogTitle", blogImageBlogURL)
                         }
@@ -124,18 +128,28 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
         // blogTitle --> The most recent article downloaded via WorkManager from the endpoint.
 
         // To make this determination, we need to know what the old SharedPref blogtitle is.
-        var currentSharedPrefTitle = AppSharedPreferences.getAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE)
+        var currentSharedPrefTitle =
+            AppSharedPreferences.getAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE)
+        var newerSharedPrefTitle = ""
 
         // Looks to compare to see if we have a newer blogtitle or not.
-        if (blogTitle != "" && currentSharedPrefTitle != blogTitle) {
-            // Save the newest blog article to our SharedPref variable.
-            AppSharedPreferences.setAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE,
-                blogTitle)
-            currentSharedPrefTitle = blogTitle
+        if (currentSharedPrefTitle != "") {
+            // currentSharedPrefTitle == "" the first time the app runs.
+            if (blogTitle != "" && currentSharedPrefTitle != blogTitle) {
+                // Save the newest blog article to our SharedPref variable.
+                AppSharedPreferences.setAppSharedPreferences(
+                    applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE,
+                    blogTitle )
+                newerSharedPrefTitle = blogTitle
+            }
+        } else {
+            // Runs the first time the app is installed.
+            AppSharedPreferences.setAppSharedPreferences(
+                applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE,
+                blogTitle )
         }
-
-        return currentSharedPrefTitle
-    }
+        return newerSharedPrefTitle
+}
 
 
     /*
