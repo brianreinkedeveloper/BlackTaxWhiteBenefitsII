@@ -1,4 +1,4 @@
-package com.sppaeknierrnairb.blacktaxandwhitebenefits
+package com.blacktaxandwhitebenefits
 
 object ProjectData {
     // TODO: Please use UPPER_CASE names for constants
