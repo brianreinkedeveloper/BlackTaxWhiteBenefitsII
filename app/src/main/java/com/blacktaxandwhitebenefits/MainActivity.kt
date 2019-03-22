@@ -3,6 +3,8 @@ package com.blacktaxandwhitebenefits
 
 
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -17,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 
@@ -137,6 +140,15 @@ class MainActivity : AppCompatActivity() {
                 // Retrofit succeeded to get networking and is hitting main url.
                 // Retrofit only responds after it gets the data.
                 if (response.isSuccessful) {
+                    // Check response code in case previous retrofit call was unsuccessful.
+                    // success codes: 200-299
+                    if (response.code() >= 200 && response.code()< 300) {
+                        // good connection
+                        rl_maincontent.visibility=View.VISIBLE
+                        rl_nointernet.visibility=View.GONE
+                        but_refreshconnection.isEnabled=true
+                    }
+
                     val body = response.body()  // The entire JSON body.
                     val bodyLastIndex = body!!.lastIndex
 
@@ -172,20 +184,51 @@ class MainActivity : AppCompatActivity() {
                     pageButtonsRestoreState()
                     stopProgressBar()
                 } else {
-                    // no data in query.
-                    if (response.code() == 400) {
-                        // Thankfully, the recyclerView doesn't fail here.
-                        Log.i("!!!", "query is not found in retrofit!!")
-                    }
-                    pageButtonsRestoreState()
+                    // response.isSuccessful is not true here.
+                    /* Could be several issues but all are issues with the query itself:
+                        -- mal-formatted query.
+                        --
+                     */
                     stopProgressBar()
+//                    pageButtonsRestoreState()
+                    ll_badresponsecode.visibility=View.VISIBLE
+
+                    var buildErrorString: String = ""
+                    buildErrorString += "*** There is a problem with the query. ***"
+                    buildErrorString += "URL Error code: " + response.raw().code().toString() + "--"
+                    buildErrorString += "Response message: " + response.message()
+                    buildErrorString += "...no further details are available."
+
+                    // There won't be any response body here since query was malformed.
+                    Log.e("!!!", buildErrorString)
                 }
             }
 
             override fun onFailure(call: Call<List<BlogArticles>>, t: Throwable) {
-                // No network or cannot get to URL.
-                Log.i("!!!", "retrofit failed!")
+                // Almost always, no network or network connection issues, but we need to make sure.
                 stopProgressBar()
+
+                if (t is IOException) {
+                    // We know we have an internet connection issue.
+                        rl_nointernet.visibility=View.VISIBLE
+                        rl_maincontent.visibility=View.GONE
+
+                        but_refreshconnection.setOnClickListener {
+                            val connectivity = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                            val networkInfo=connectivity.activeNetworkInfo
+                            if (networkInfo != null && networkInfo.isConnected) {
+                                rl_maincontent.visibility=View.VISIBLE
+                                rl_nointernet.visibility=View.GONE
+                                runEnqueue(ProjectData.currentPage)
+                            }
+                        }
+                } else {
+                    // Get the explicit error
+                    var buildErrorString: String = ""
+                    buildErrorString += "*** There is some kind of unknown (possibly internet connection) issue. ***"
+                    buildErrorString += "Exact message error: '" + t.message + "'"
+                    Log.e("!!!", buildErrorString)
+                }
             }
         })
     }
