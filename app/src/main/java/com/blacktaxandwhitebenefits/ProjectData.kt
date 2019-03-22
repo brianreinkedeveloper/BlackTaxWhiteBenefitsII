@@ -16,8 +16,8 @@ object ProjectData {
     // TODO: should be HTML_TEXT_SIZE_DEFAULT = 22
     var htmlTextSize = htmlTextSizeDefault
 
-    var butPrevPageState = false
-    var butNextPageState = false
+    var butPrevPageState: Boolean? = false
+    var butNextPageState: Boolean? = false
 
     var buttonClicked=""
 }
