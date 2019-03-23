@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.RecycleDTO
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.recycle_item.view.*
 import java.util.*
 
@@ -30,17 +31,25 @@ class Adapter(val myList: MutableList<RecycleDTO>): RecyclerView.Adapter<Adapter
         holder.titleView.text = myList[position].title
 
 
+        val requestOptions: RequestOptions by lazy {
+            RequestOptions()
+                .placeholder(R.drawable.hands_40opacity_smaller)
+//                .transforms(CenterCrop())
+        }
+
         // Note: Image URL cannot be null.
         // URL can be a non-existant URL but does need to be something.
         if (myList[position].imageBlogURL != "") {
             Glide.with(this.adapterContext)
                 .load(myList[position].imageBlogURL)
+                .apply(requestOptions)
                 .into(holder.imageView)
 
         } else {
             // Load default image.
             Glide.with(this.adapterContext)
                 .load(R.drawable.no_image)
+                .apply(requestOptions)
                 .into(holder.imageView)
         }
     }
