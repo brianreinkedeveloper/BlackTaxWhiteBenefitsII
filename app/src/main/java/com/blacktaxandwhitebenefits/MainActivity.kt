@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Must be here in onCreate() here otherwise things won't work correctly.
+
         initialize()
         setupListeners()
 
@@ -214,7 +215,7 @@ class MainActivity : AppCompatActivity() {
         }
         Log.i("!!!", "current page" + ProjectData.currentPage.toString())
         pageButtonsSaveState(ProjectData.currentPage)
-
+      
         initBackgroundTask()
     }
 
