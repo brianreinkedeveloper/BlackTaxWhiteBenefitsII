@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.work.*
 import com.blacktaxandwhitebenefits.WorkManager.BackgroundTask
@@ -29,10 +31,20 @@ class MainActivity : AppCompatActivity() {
 //    private val service = RetrofitClientInstance.retrofitInstance?.create(GetBlogService::class.java)
     var myList = mutableListOf<RecycleDTO>()
 
+    // Action bar icons
+    var actionbarNavAfterActive: MenuItem? = null
+    var actionbarNavAfterInActive: MenuItem? = null
+    var actionbarNavBeforeActive: MenuItem? = null
+    var actionbarNavBeforeInActive: MenuItem? = null
+
+    //
+    // MainActivity
+    //
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Must be here in onCreate() here otherwise things won't work correctly.
 
         initialize()
         setupListeners()
@@ -41,7 +53,6 @@ class MainActivity : AppCompatActivity() {
         // RetrofitClientInstance
         //
         runEnqueue(ProjectData.currentPage)
-
     }
 
 
@@ -52,15 +63,159 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    //
+    // Menu
+    //
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_mainactactionbar, menu)
+
+        this.actionbarNavAfterActive=menu?.findItem(R.id.navafteractive)
+        this.actionbarNavAfterInActive=menu?.findItem(R.id.navafterinactive)
+
+        this.actionbarNavBeforeActive=menu?.findItem(R.id.navbeforeactive)
+        this.actionbarNavBeforeInActive=menu?.findItem(R.id.navbeforeinactive)
+
+//        return super.onCreateOptionsMenu(menu)
+        return true
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val menuID = item?.itemId
+        when (menuID) {
+            // we don't want to do anything if the menu is somehow inactive.
+            R.id.navbeforeactive -> {
+                // prev page
+                pressPrevPage()
+                return true}
+            R.id.navafteractive -> {
+                // next page
+                pressNextPage()
+                return true}
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+
+    private fun pressPrevPage() {
+        ProjectData.buttonClicked ="prev"
+
+        // We have to make both buttons inactive while data loads otherwise strange things occur...wouldn't be an issue
+        //   if we had DialogFragment.
+        setPrevPageInactive()
+        setNextPageInActive()
+
+        // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
+        recyclerView.visibility=View.INVISIBLE
+
+//        // Turn "off" buttons until network load finishes
+//        butPagePrev.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
+//        butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
+
+        ProjectData.currentPage--
+        if (ProjectData.currentPage == 1) {
+//            butPagePrev.isEnabled = false
+
+            // This sets prevpage to inactive icon
+            setPrevPageInactive()
+        } else {
+//            butPagePrev.isEnabled = true
+//            ProjectData.butNextPageState =butPageNext.isEnabled
+
+            // This sets nextpage to active icon
+//            setNextPageActive()
+        }
+        preparePage(ProjectData.currentPage)
+    }
+
+
+    private fun pressNextPage() {
+        // We turn it off until network load is finished.
+        ProjectData.buttonClicked ="next"
+//        butPageNext.isEnabled=false
+
+        // We have to make both buttons inactive while data loads otherwise strange things occur...wouldn't be an issue
+        //   if we had DialogFragment.
+        setPrevPageInactive()
+        setNextPageInActive()
+
+        // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
+        recyclerView.visibility=View.INVISIBLE
+
+//        // Turn "off" buttons until network load finishes to give a 'disabled' look.
+//        butPagePrev.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
+//        butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
+
+        ProjectData.currentPage++
+        if (ProjectData.currentPage == ProjectData.maxPagesAtCompile) {
+//            butPageNext.isEnabled = false
+//            ProjectData.butNextPageState =butPageNext.isEnabled
+
+            // disable next page as we're at the end.
+            actionbarNavAfterActive?.setEnabled(false)
+            actionbarNavAfterInActive?.setEnabled(true)
+            ProjectData.butNextPageState = false
+        }
+
+        preparePage(ProjectData.currentPage)
+    }
+
+
+    fun setNextPageActive() {
+        actionbarNavAfterInActive?.setEnabled(false)
+        actionbarNavAfterInActive?.setEnabled(false)
+
+        actionbarNavAfterActive?.setVisible(true)
+        actionbarNavAfterInActive?.setVisible(false)
+
+        ProjectData.butNextPageState = actionbarNavAfterActive?.isEnabled
+    }
+
+    fun setNextPageInActive() {
+        actionbarNavAfterInActive?.setEnabled(false)
+        actionbarNavAfterActive?.setEnabled(true)
+
+        actionbarNavAfterInActive?.setVisible(true)
+        actionbarNavAfterActive?.setVisible(false)
+
+        // not using this here.
+//        ProjectData.butNextPageState = actionbarNavAfterInActive?.isEnabled
+    }
+
+    fun setPrevPageInactive() {
+        actionbarNavBeforeInActive?.setEnabled(false)
+        actionbarNavBeforeActive?.setEnabled(false)
+
+        actionbarNavBeforeInActive?.setVisible(true)
+        actionbarNavBeforeActive?.setVisible(false)
+
+        ProjectData.butPrevPageState = false
+    }
+
+    fun setPrevPageActive() {
+        actionbarNavBeforeActive?.setEnabled(true)
+        actionbarNavBeforeInActive?.setEnabled(false)
+
+        actionbarNavBeforeActive?.setVisible(true)
+        actionbarNavBeforeInActive?.setVisible(false)
+
+        ProjectData.butPrevPageState = actionbarNavBeforeActive?.isEnabled
+    }
+
+
+
     private fun initialize() {
-        butPagePrev.text="<"
-        butPageNext.text=">"
+//        butPagePrev.text="<"
+//        butPageNext.text=">"
 
         // Initially, we don't this button active as there is no page 0.
         if  (!ProjectData.onSavedState) {
-            butPagePrev.isEnabled=false
+//            butPagePrev.isEnabled=false
+            setPrevPageInactive()
         }
-        pageButtonsSaveState()
+        Log.i("!!!", "current page" + ProjectData.currentPage.toString())
+        pageButtonsSaveState(ProjectData.currentPage)
+      
         initBackgroundTask()
     }
 
@@ -80,47 +235,47 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun setupListeners() {
-        butPagePrev.setOnClickListener {
-            ProjectData.buttonClicked ="prev"
+//        butPagePrev.setOnClickListener {
+//            ProjectData.buttonClicked ="prev"
+//
+//            // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
+//            recyclerView.visibility=View.INVISIBLE
+//
+//            // Turn "off" buttons until network load finishes
+//            butPagePrev.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
+//            butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
+//
+//            ProjectData.currentPage--
+//            if (ProjectData.currentPage ==1) {
+//                butPagePrev.isEnabled = false
+//                ProjectData.butPrevPageState =false
+//            } else{
+//                butPagePrev.isEnabled = true
+//                ProjectData.butNextPageState =butPageNext.isEnabled
+//            }
+//            preparePage(ProjectData.currentPage)
+//        }
 
-            // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
-            recyclerView.visibility=View.INVISIBLE
-
-            // Turn "off" buttons until network load finishes
-            butPagePrev.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
-            butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
-
-            ProjectData.currentPage--
-            if (ProjectData.currentPage ==1) {
-                butPagePrev.isEnabled = false
-                ProjectData.butPrevPageState =false
-            } else{
-                butPagePrev.isEnabled = true
-                ProjectData.butNextPageState =butPageNext.isEnabled
-            }
-            preparePage(ProjectData.currentPage)
-        }
-
-        butPageNext.setOnClickListener {
-            // We turn it off until network load is finished.
-            ProjectData.buttonClicked ="next"
-            butPageNext.isEnabled=false
-
-            // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
-            recyclerView.visibility=View.INVISIBLE
-
-            // Turn "off" buttons until network load finishes to give a 'disabled' look.
-            butPagePrev.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
-            butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
-
-            ProjectData.currentPage++
-            if (ProjectData.currentPage == ProjectData.maxPagesAtCompile) {
-                butPageNext.isEnabled = false
-                ProjectData.butNextPageState =butPageNext.isEnabled
-            }
-
-            preparePage(ProjectData.currentPage)
-        }
+//        butPageNext.setOnClickListener {
+//            // We turn it off until network load is finished.
+//            ProjectData.buttonClicked ="next"
+//            butPageNext.isEnabled=false
+//
+//            // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
+//            recyclerView.visibility=View.INVISIBLE
+//
+//            // Turn "off" buttons until network load finishes to give a 'disabled' look.
+//            butPagePrev.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
+//            butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
+//
+//            ProjectData.currentPage++
+//            if (ProjectData.currentPage == ProjectData.maxPagesAtCompile) {
+//                butPageNext.isEnabled = false
+//                ProjectData.butNextPageState =butPageNext.isEnabled
+//            }
+//
+//            preparePage(ProjectData.currentPage)
+//        }
     }
 
 
@@ -143,7 +298,7 @@ class MainActivity : AppCompatActivity() {
                     // Check response code in case previous retrofit call was unsuccessful.
                     // success codes: 200-299
                     if (response.code() >= 200 && response.code()< 300) {
-                        // good connection
+                        // Verified good connection...remove 'no internet page' in case it was displaying.
                         rl_maincontent.visibility=View.VISIBLE
                         rl_nointernet.visibility=View.GONE
                         but_refreshconnection.isEnabled=true
@@ -180,6 +335,7 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
 
+                    // Make GUI changes after data is fully loaded.
                     displayData(this@MainActivity.myList)
                     pageButtonsRestoreState()
                     stopProgressBar()
@@ -239,16 +395,24 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun pageButtonsSaveState() {
+    private fun pageButtonsSaveState(currentPage: Int) {
          /* Enables the paging buttons...these are the reasons:
             1) If you keep clicking NextPage, it eventually "goes past" page 5 and loads many more records in the List than it should.
             2) The same thing happens with PrevPage.
           */
 
         // save button sates
-        ProjectData.butPrevPageState = butPagePrev.isEnabled
-        ProjectData.butNextPageState = butPageNext.isEnabled
+//        ProjectData.butPrevPageState = butPagePrev.isEnabled
+//        ProjectData.butNextPageState = butPageNext.isEnabled
 
+
+
+//        ProjectData.butPrevPageState = actionbarNavBeforeActive?.isEnabled
+//        ProjectData.butNextPageState = actionbarNavAfterActive?.isEnabled
+
+        if (currentPage == 1) {
+            setPrevPageInactive()
+        }
     }
 
     private fun pageButtonsRestoreState() {
@@ -259,18 +423,21 @@ class MainActivity : AppCompatActivity() {
 
         // Restore button states
         if (ProjectData.currentPage > 1) {
-            butPagePrev.isEnabled=true
-            ProjectData.butPrevPageState =butPagePrev.isEnabled
-            butPagePrev.setBackgroundColor(resources.getColor(R.color.colorSecondaryLight))
-            butPageNext.setBackgroundColor(resources.getColor(R.color.colorSecondaryLight))
+//            butPagePrev.isEnabled=true
+//            butPagePrev.setBackgroundColor(resources.getColor(R.color.colorSecondaryLight))
+//            butPageNext.setBackgroundColor(resources.getColor(R.color.colorSecondaryLight))
+            setPrevPageActive()
+            setNextPageActive()
+
         }
         if (ProjectData.currentPage < ProjectData.maxPages) {
-            butPageNext.isEnabled=true
-            ProjectData.butPrevPageState =butPageNext.isEnabled
-            butPageNext.setBackgroundColor(resources.getColor(R.color.colorSecondaryLight))
+//            butPageNext.isEnabled=true
+//            butPageNext.setBackgroundColor(resources.getColor(R.color.colorSecondaryLight))
+            setNextPageActive()
         }
         if (ProjectData.currentPage == ProjectData.maxPages) {
-            butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
+//            butPageNext.setBackgroundColor(resources.getColor(R.color.colorWidgetLight))
+            setNextPageInActive()
         }
     }
 

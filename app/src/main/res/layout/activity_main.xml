@@ -31,31 +31,31 @@
             android:layout_centerHorizontal="true"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/butPagePrev"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="?android:attr/buttonBarButtonStyle"
-                android:minWidth="@dimen/pageButtonSize"
-                android:minHeight="@dimen/pageButtonSize"
-                android:layout_margin="8dp"
-                android:enabled="false"
-                android:background="@color/colorWidgetLight"
-                android:textColor="@android:color/black">
-            </Button>
+            <!--<Button-->
+                <!--android:id="@+id/butPagePrev"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--style="?android:attr/buttonBarButtonStyle"-->
+                <!--android:minWidth="@dimen/pageButtonSize"-->
+                <!--android:minHeight="@dimen/pageButtonSize"-->
+                <!--android:layout_margin="8dp"-->
+                <!--android:enabled="false"-->
+                <!--android:background="@color/colorWidgetLight"-->
+                <!--android:textColor="@android:color/black">-->
+            <!--</Button>-->
 
-            <Button
-                android:id="@+id/butPageNext"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="@dimen/pageButtonSize"
-                android:minHeight="@dimen/pageButtonSize"
-                android:layout_margin="8dp"
-                android:enabled="true"
-                android:background="@color/colorWidgetLight"
-                android:textColor="@android:color/black">
-            </Button>
+            <!--<Button-->
+                <!--android:id="@+id/butPageNext"-->
+                <!--style="?android:attr/buttonBarButtonStyle"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:minWidth="@dimen/pageButtonSize"-->
+                <!--android:minHeight="@dimen/pageButtonSize"-->
+                <!--android:layout_margin="8dp"-->
+                <!--android:enabled="true"-->
+                <!--android:background="@color/colorWidgetLight"-->
+                <!--android:textColor="@android:color/black">-->
+            <!--</Button>-->
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView

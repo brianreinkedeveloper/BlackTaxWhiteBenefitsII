@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.RecycleDTO
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.recycle_item.view.*
 import java.util.*
 
@@ -32,13 +33,13 @@ class Adapter(val myList: MutableList<RecycleDTO>): RecyclerView.Adapter<Adapter
         // Note: Image URL cannot be null.
         // URL can be a non-existant URL but does need to be something.
         if (myList[position].imageBlogURL != "") {
-            GlideApp.with(this.adapterContext)
+            Glide.with(this.adapterContext)
                 .load(myList[position].imageBlogURL)
                 .into(holder.imageView)
 
         } else {
             // Load default image.
-            GlideApp.with(this.adapterContext)
+            Glide.with(this.adapterContext)
                 .load(R.drawable.no_image)
                 .into(holder.imageView)
         }
