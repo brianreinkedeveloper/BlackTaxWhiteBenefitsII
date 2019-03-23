@@ -20,13 +20,15 @@
 		android:id="@+id/navafteractive"
 		android:title="navafteractive"
 		android:icon="@drawable/ic_action_navigate_next_white_24dp_activefocused"
-		android:visible="true"
+		android:visible="false"
+		android:enabled="true"
 		app:showAsAction="always" />
 
 	<item
 		android:id="@+id/navafterinactive"
 		android:title="navafterinactive"
 		android:icon="@drawable/ic_action_navigate_next_white_24dp_inactive"
-		android:visible="false"
+		android:visible="true"
+		android:enabled="false"
 		app:showAsAction="always" />
 </menu>

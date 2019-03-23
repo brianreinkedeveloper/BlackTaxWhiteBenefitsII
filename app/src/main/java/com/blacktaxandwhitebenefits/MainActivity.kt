@@ -103,6 +103,11 @@ class MainActivity : AppCompatActivity() {
     private fun pressPrevPage() {
         ProjectData.buttonClicked ="prev"
 
+        // We have to make both buttons inactive while data loads otherwise strange things occur...wouldn't be an issue
+        //   if we had DialogFragment.
+        setPrevPageInactive()
+        setNextPageInActive()
+
         // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
         recyclerView.visibility=View.INVISIBLE
 
@@ -121,7 +126,7 @@ class MainActivity : AppCompatActivity() {
 //            ProjectData.butNextPageState =butPageNext.isEnabled
 
             // This sets nextpage to active icon
-            setNextPageActive()
+//            setNextPageActive()
         }
         preparePage(ProjectData.currentPage)
     }
@@ -131,6 +136,11 @@ class MainActivity : AppCompatActivity() {
         // We turn it off until network load is finished.
         ProjectData.buttonClicked ="next"
 //        butPageNext.isEnabled=false
+
+        // We have to make both buttons inactive while data loads otherwise strange things occur...wouldn't be an issue
+        //   if we had DialogFragment.
+        setPrevPageInactive()
+        setNextPageInActive()
 
         // Hide RecyclerView when loading data...why? If visible, the user can scroll on the page and the app will crash!
         recyclerView.visibility=View.INVISIBLE
@@ -207,7 +217,7 @@ class MainActivity : AppCompatActivity() {
             setPrevPageInactive()
         }
         Log.i("!!!", "current page" + ProjectData.currentPage.toString())
-        pageButtonsSaveState()
+        pageButtonsSaveState(ProjectData.currentPage)
 
         initBackgroundTask()
     }
@@ -291,7 +301,7 @@ class MainActivity : AppCompatActivity() {
                     // Check response code in case previous retrofit call was unsuccessful.
                     // success codes: 200-299
                     if (response.code() >= 200 && response.code()< 300) {
-                        // good connection
+                        // Verified good connection...remove 'no internet page' in case it was displaying.
                         rl_maincontent.visibility=View.VISIBLE
                         rl_nointernet.visibility=View.GONE
                         but_refreshconnection.isEnabled=true
@@ -328,6 +338,7 @@ class MainActivity : AppCompatActivity() {
                         )
                     }
 
+                    // Make GUI changes after data is fully loaded.
                     displayData(this@MainActivity.myList)
                     pageButtonsRestoreState()
                     stopProgressBar()
@@ -387,7 +398,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun pageButtonsSaveState() {
+    private fun pageButtonsSaveState(currentPage: Int) {
          /* Enables the paging buttons...these are the reasons:
             1) If you keep clicking NextPage, it eventually "goes past" page 5 and loads many more records in the List than it should.
             2) The same thing happens with PrevPage.
@@ -398,10 +409,11 @@ class MainActivity : AppCompatActivity() {
 //        ProjectData.butNextPageState = butPageNext.isEnabled
 
 
+
 //        ProjectData.butPrevPageState = actionbarNavBeforeActive?.isEnabled
 //        ProjectData.butNextPageState = actionbarNavAfterActive?.isEnabled
 
-        if (ProjectData.currentPage == 1) {
+        if (currentPage == 1) {
             setPrevPageInactive()
         }
     }
@@ -417,8 +429,9 @@ class MainActivity : AppCompatActivity() {
 //            butPagePrev.isEnabled=true
 //            butPagePrev.setBackgroundColor(resources.getColor(R.color.colorSecondaryLight))
 //            butPageNext.setBackgroundColor(resources.getColor(R.color.colorSecondaryLight))
-
             setPrevPageActive()
+            setNextPageActive()
+
         }
         if (ProjectData.currentPage < ProjectData.maxPages) {
 //            butPageNext.isEnabled=true
