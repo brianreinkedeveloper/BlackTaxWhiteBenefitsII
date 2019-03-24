@@ -13,13 +13,13 @@ import android.text.Html
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.blacktaxandwhitebenefits.ProjectData
+import com.blacktaxandwhitebenefits.R
+import com.blacktaxandwhitebenefits.WebViewActivity
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.BlogArticles
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.GetBlogService
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.RetrofitClientInstance
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences
-import com.blacktaxandwhitebenefits.ProjectData
-import com.blacktaxandwhitebenefits.R
-import com.blacktaxandwhitebenefits.WebViewActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import retrofit2.Call
@@ -100,7 +100,6 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
                             2) Returns the newest blog title assigned to SharedPref.
                          */
                         val possibleNewSharedPrefTitle = detNewerSharedPreferences(blogTitle)
-
                         if (possibleNewSharedPrefTitle != "") {
                             /*
                                We don't want the WorkManager notification to come up:
@@ -134,8 +133,8 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
         // blogTitle --> The most recent article downloaded via WorkManager from the endpoint.
 
         // To make this determination, we need to know what the old SharedPref blogtitle is.
-        var currentSharedPrefTitle =
-            AppSharedPreferences.getAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE)
+        var currentSharedPrefTitle: String =
+            AppSharedPreferences.getAppSharedPreferences(applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE).toString()
         var newerSharedPrefTitle = ""
 
         // Looks to compare to see if we have a newer blogtitle or not.
@@ -143,14 +142,14 @@ class BackgroundTask(context: Context, workerParams: WorkerParameters) : Worker(
             // currentSharedPrefTitle == "" the first time the app runs.
             if (blogTitle != "" && currentSharedPrefTitle != blogTitle) {
                 // Save the newest blog article to our SharedPref variable.
-                AppSharedPreferences.setAppSharedPreferences(
+                AppSharedPreferences.setAppSharedPreferencesSync(
                     applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE,
                     blogTitle )
                 newerSharedPrefTitle = blogTitle
             }
         } else {
             // Runs the first time the app is installed.
-            AppSharedPreferences.setAppSharedPreferences(
+            AppSharedPreferences.setAppSharedPreferencesSync(
                 applicationContext, AppSharedPreferences.SHAREDPREF_BLOGTITLE,
                 blogTitle )
         }
