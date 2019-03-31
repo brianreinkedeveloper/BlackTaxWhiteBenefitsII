@@ -68,7 +68,6 @@ class MainActivity : AppCompatActivity() {
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
-
         // PrivacyPolicy
         val privacyPolicyAccept = initialize()
         if (privacyPolicyAccept) {
@@ -512,8 +511,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-    private fun displayPrivacyPolicy() {
+   private fun displayPrivacyPolicy() {
         var privacyPolicyStr = "<p><b>Black Tax and White Benefits Privacy Policy</b></p>\n" +
                 "<p>Neil Jay Warner and associates built the BlackTax and White Benefits app as an Open Source app. This SERVICE is provided by Neil Jay Warner and associates at no cost and is\n" +
                 "intended for use as is.</p>\n" +
@@ -600,6 +598,4 @@ class MainActivity : AppCompatActivity() {
             ProjectData.acceptPrivacyPolicy = privacyAcceptanceStringValue.toBoolean()
         }
     }
-
-
 }

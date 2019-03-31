@@ -21,10 +21,8 @@ object ProjectData {
     var knownGoodLastPage: Int = 1                // Will eventually be loaded from sharedpreferences.
 
 
-
     // Variables for Privacy Policy
     var acceptPrivacyPolicy = false
-
 
 
     var onSavedState = false
@@ -45,7 +43,6 @@ object ProjectData {
     const val putExtra_BlogWebView = "EXTRA_BLOGWEBVIEW"
     const val SHAREDPREF_KNOWNLASTPAGE = "SHAREDPREF_KNOWNLASTPAGE"
     const val SHAREDPREF_PRIVACYPOLICY = "SHAREDPREF_PRIVACYPOLICY"
-
 }
 
 
