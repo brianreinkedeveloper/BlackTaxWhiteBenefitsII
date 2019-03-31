@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "579995913597",
+    "firebase_url": "https://blacktax-4867c.firebaseio.com",
+    "project_id": "blacktax-4867c",
+    "storage_bucket": "blacktax-4867c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:579995913597:android:269f067f535553f0",
+        "android_client_info": {
+          "package_name": "com.blacktaxandwhitebenefits"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "579995913597-vbgi9edpncbi2epj8956fg19tdnu8be8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.blacktaxandwhitebenefits",
+            "certificate_hash": "bd0b58de33a5169ce36083b621dfd751a8c8294c"
+          }
+        },
+        {
+          "client_id": "579995913597-hg5b3shq0co5ma30fesh55tutprkq8h5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTRVZ1zuf2VpjbQe6SWdt9ZOQsUgJT0JI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "579995913597-hg5b3shq0co5ma30fesh55tutprkq8h5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
