@@ -32,29 +32,29 @@
             android:orientation="horizontal">
 
             <!--<Button-->
-                <!--android:id="@+id/butPagePrev"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--style="?android:attr/buttonBarButtonStyle"-->
-                <!--android:minWidth="@dimen/pageButtonSize"-->
-                <!--android:minHeight="@dimen/pageButtonSize"-->
-                <!--android:layout_margin="8dp"-->
-                <!--android:enabled="false"-->
-                <!--android:background="@color/colorWidgetLight"-->
-                <!--android:textColor="@android:color/black">-->
+            <!--android:id="@+id/butPagePrev"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--style="?android:attr/buttonBarButtonStyle"-->
+            <!--android:minWidth="@dimen/pageButtonSize"-->
+            <!--android:minHeight="@dimen/pageButtonSize"-->
+            <!--android:layout_margin="8dp"-->
+            <!--android:enabled="false"-->
+            <!--android:background="@color/colorWidgetLight"-->
+            <!--android:textColor="@android:color/black">-->
             <!--</Button>-->
 
             <!--<Button-->
-                <!--android:id="@+id/butPageNext"-->
-                <!--style="?android:attr/buttonBarButtonStyle"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:minWidth="@dimen/pageButtonSize"-->
-                <!--android:minHeight="@dimen/pageButtonSize"-->
-                <!--android:layout_margin="8dp"-->
-                <!--android:enabled="true"-->
-                <!--android:background="@color/colorWidgetLight"-->
-                <!--android:textColor="@android:color/black">-->
+            <!--android:id="@+id/butPageNext"-->
+            <!--style="?android:attr/buttonBarButtonStyle"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:minWidth="@dimen/pageButtonSize"-->
+            <!--android:minHeight="@dimen/pageButtonSize"-->
+            <!--android:layout_margin="8dp"-->
+            <!--android:enabled="true"-->
+            <!--android:background="@color/colorWidgetLight"-->
+            <!--android:textColor="@android:color/black">-->
             <!--</Button>-->
         </LinearLayout>
 
@@ -123,6 +123,48 @@
             android:textSize="30sp" />
     </LinearLayout>
 
+
+
+    <ScrollView
+        android:id="@+id/rl_privacypolicy"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <WebView
+                android:id="@+id/txt_privacypolicy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/but_privacy_accept"
+                android:layout_margin="20dp"
+                android:lineSpacingMultiplier="1.5"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <Button
+                    android:id="@+id/but_privacy_reject"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_margin="4dp"
+                    android:text="Cancel" />
+
+                <Button
+                    android:id="@+id/but_privacy_accept"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_margin="4dp"
+                    android:text="Accept Policy" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>
-
-

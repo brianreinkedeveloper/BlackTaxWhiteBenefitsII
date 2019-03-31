@@ -2,7 +2,6 @@ package com.blacktaxandwhitebenefits
 
 
 
-
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Build
@@ -24,8 +23,11 @@ import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.BlogArti
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.GetBlogService
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.RecycleDTO
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.RetrofitClientInstance
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences.getAppSharedPreferences
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences.getAppSharedPreferencesInt
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences.setAppSharedPreferencesAsync
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences.setAppSharedPreferencesSync
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import retrofit2.Call
@@ -35,7 +37,14 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 
+
+
+
+
 class MainActivity : AppCompatActivity() {
+
+    // Firebase Analytics
+    private var mFirebaseAnalytics: FirebaseAnalytics? = null
 
     // Retrofit service.
     private val service = RetrofitClientInstance.retrofitInstance?.create(GetBlogService::class.java)
@@ -54,14 +63,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Must be here in onCreate() here otherwise things won't work correctly.
+        // We must setup out code here in onCreate() here otherwise things won't work correctly.
 
-        initialize()
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
-        //
-        // RetrofitClientInstance
-        //
-        loadRetrofitPages(service, ProjectData.currentPage)
+
+        // PrivacyPolicy
+        val privacyPolicyAccept = initialize()
+        if (privacyPolicyAccept) {
+            //
+            // RetrofitClientInstance
+            //
+            loadRetrofitPages(service, ProjectData.currentPage)
+        }
     }
 
 
@@ -197,22 +212,28 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private fun initialize() {
+    private fun initialize(): Boolean {
 //        butPagePrev.text="<"
 //        butPageNext.text=">"
 
-        // Sets last known good page from sharedpref
-        ProjectData.knownGoodLastPage = getAppSharedPreferencesInt(this@MainActivity, ProjectData.SHAREDPREF_KNOWNLASTPAGE)
-        if (ProjectData.knownGoodLastPage > RetrofitReadaHeadClass.knownGoodLastPage) {
-            RetrofitReadaHeadClass.knownGoodLastPage = ProjectData.knownGoodLastPage
+        // Gets Privacy Policy from SharedPref
+        getsPreferenceData()
+
+        if (!ProjectData.acceptPrivacyPolicy) {
+            displayPrivacyPolicy()
+            listenPrivacyAcceptance()
         }
 
-        // Initially, we don't this button active as there is no page 0.
-        if  (!ProjectData.onSavedState) {
-            setPrevPageInactive()
+        if (ProjectData.acceptPrivacyPolicy) {
+            // Initially, we don't this button active as there is no page 0.
+            if (!ProjectData.onSavedState) {
+                setPrevPageInactive()
+            }
+            Log.i("!!!", "current page" + ProjectData.currentPage.toString())
+            initBackgroundTask()
         }
-        Log.i("!!!", "current page" + ProjectData.currentPage.toString())
-        initBackgroundTask()
+
+        return ProjectData.acceptPrivacyPolicy
     }
 
 
@@ -489,6 +510,96 @@ class MainActivity : AppCompatActivity() {
         loadRetrofitPages(service, currentPage)
     }
 
+
+
+
+    private fun displayPrivacyPolicy() {
+        var privacyPolicyStr = "<p><b>Black Tax and White Benefits Privacy Policy</b></p>\n" +
+                "<p>Neil Jay Warner and associates built the BlackTax and White Benefits app as an Open Source app. This SERVICE is provided by Neil Jay Warner and associates at no cost and is\n" +
+                "intended for use as is.</p>\n" +
+                "<p>This page is used to inform visitors regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my Service.</p>\n" +
+                "<p>If you choose to use my Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that I collect is used for providing\n" +
+                "and improving the Service. I will not use or share your information with anyone except as described in this Privacy Policy.</p>\n" +
+                "<p>The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at BlackTax and White Benefits unless otherwise defined in this\n" +
+                "Privacy Policy.<br/></p>\n" +
+                "<p><b>Information Collection and Use</b></p>\n" +
+                "<p>For a better experience, while using our Service, I may require you to provide us with certain personally identifiable information. The information that I request will be\n" +
+                "retained on your device and is not collected by me in any way.</p>\n" +
+                "<p>The app does use third party services that may collect information used to identify you.</p>\n" +
+                "<p>Link to privacy policy of third party service providers that may be used by the app:<br/>* Google Play Services<br/>* Firebase Analytics<br/>* Crashlytics</p>\n" +
+                "<p><b>Log Data</b></p>\n" +
+                "<p>I want to inform you that whenever you use my Service, in a case of an error in the app I collect data and information (through third party products) on your phone called Log\n" +
+                "Data. This Log Data may include information such as your device Internet Protocol (\"IP\") address, device name, operating system version, the configuration of the app when\n" +
+                "utilizing my Service, the time and date of your use of the Service, and other statistics.</p>\n" +
+                "<p><b>Cookies</b></p>\n" +
+                "<p>Cookies are files with a small amount of data that are commonly used as anonymous unique identifiers. These are sent to your browser from the websites that you visit and are\n" +
+                "stored on your device's internal memory. This Service does not use these \"cookies\" explicitly. However, the app may use third party code and libraries that use 'cookies'; to collect information and improve their\n" +
+                "services. You have the option to either accept or refuse these cookies and know when a cookie is being sent to your device. If you choose to refuse our cookies, you may not be \n" +
+                "able to use some portions of this Service.</p>\n" +
+                "<p><b>Service Providers</b></p>\n" +
+                "<p>I may employ third-party companies and individuals due to the following reasons:<br/>* To facilitate our Service;<br/>* To provide the Service on our behalf;<br/>* To perform Service-related services; or<br/>* To assist us in analyzing how our Service is used.</p>\n" +
+                "<p>I want to inform users of this Service that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf.\n" +
+                "However, they are obligated not to disclose or use the information for any other purpose.</p>\n" +
+                "<p><b>Security</b></p>\n" +
+                "<p>I value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of\n" +
+                "transmission over the internet, or method of electronic storage is 100% secure and reliable, and I cannot guarantee its absolute security.</p>\n" +
+                "<p><b>Links to Other Sites</b></p>\n" +
+                "<p>This Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by me.\n" +
+                "Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or\n" +
+                "practices of any third-party sites or services.</p>\n" +
+                "<p><b>Children's Privacy</b></p>\n" +
+                "<p>These Services do not address anyone under the age of 13. I do not knowingly collect personally identifiable information from children under 13. In the case I discover that a\n" +
+                "child under 13 has provided me with personal information, I immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has\n" +
+                "provided us with personal information, please contact me so that I will be able to do necessary actions.</p>\n" +
+                "<p><b>Changes to This Privacy Policy</b></p>\n" +
+                "<p>I may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. I will notify you of any changes by posting the new\n" +
+                "Privacy Policy on this page. These changes are effective immediately after they are posted on this page.<p>\n" +
+                "<p><b>Contact Us</b></p>\n" +
+                "<p>If you have any questions or suggestions about my Privacy Policy, do not hesitate to contact me. This privacy policy page was created at privacypolicytemplate.net and modified/generated by \n" +
+                "<a href=\"https://app-privacy-policy-generator.firebaseapp.com/\">App Privacy Policy Generator</a></p><p><b>" +
+                "<p> </p>"
+
+
+        txt_privacypolicy.loadData(privacyPolicyStr,"text/html", "utf-8")
+        rl_maincontent.visibility = View.GONE
+        rl_privacypolicy.visibility = View.VISIBLE
+    }
+
+
+    private fun listenPrivacyAcceptance() {
+        // Listen for Privacy Acceptance
+        but_privacy_reject.setOnClickListener {
+            finish()
+        }
+
+        but_privacy_accept.setOnClickListener {
+            ProjectData.acceptPrivacyPolicy=true
+            setAppSharedPreferencesSync(this@MainActivity, ProjectData.SHAREDPREF_PRIVACYPOLICY, ProjectData.acceptPrivacyPolicy.toString())
+            rl_privacypolicy.visibility=View.GONE
+
+            // restart MainActivity.
+            val intent = intent
+            finish()
+            startActivity(intent)
+        }
+    }
+
+
+    private fun getsPreferenceData() {
+        // Sets last known good page from sharedpref
+        ProjectData.knownGoodLastPage = getAppSharedPreferencesInt(this@MainActivity, ProjectData.SHAREDPREF_KNOWNLASTPAGE)
+        if (ProjectData.knownGoodLastPage > RetrofitReadaHeadClass.knownGoodLastPage) {
+            RetrofitReadaHeadClass.knownGoodLastPage = ProjectData.knownGoodLastPage
+        }
+
+        // Gets information regarding Privacy Policy
+        var privacyAcceptanceStringValue = getAppSharedPreferences(this@MainActivity, ProjectData.SHAREDPREF_PRIVACYPOLICY)!!
+        if (privacyAcceptanceStringValue == "") {
+            ProjectData.acceptPrivacyPolicy = false
+        } else {
+            ProjectData.acceptPrivacyPolicy = privacyAcceptanceStringValue.toBoolean()
+        }
+    }
 
 
 }

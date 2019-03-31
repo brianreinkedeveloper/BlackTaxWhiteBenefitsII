@@ -12,7 +12,7 @@
 		android:id="@+id/navbeforeinactive"
 		android:title="navbeforeinactive"
 		android:icon="@drawable/ic_action_navigate_before_white_24dp_inactive"
-		android:visible="true"
+		android:visible="false"
 		android:enabled="false"
 		app:showAsAction="always" />
 
@@ -28,7 +28,7 @@
 		android:id="@+id/navafterinactive"
 		android:title="navafterinactive"
 		android:icon="@drawable/ic_action_navigate_next_white_24dp_inactive"
-		android:visible="true"
+		android:visible="false"
 		android:enabled="false"
 		app:showAsAction="always" />
 </menu>
