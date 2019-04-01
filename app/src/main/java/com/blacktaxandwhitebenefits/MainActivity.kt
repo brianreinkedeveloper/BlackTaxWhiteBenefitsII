@@ -287,6 +287,8 @@ class MainActivity : AppCompatActivity() {
                         RetrofitReadaHeadClass.readAHeadStatus = RetrofitReadAHead.FINISHED
                     } else {
                         RetrofitReadaHeadClass.readAHeadStatus = RetrofitReadAHead.ERROR
+                        rl_maincontent.visibility=View.GONE
+                        ll_badresponsecode.visibility=View.VISIBLE
                         Log.i("!!!", "query is not found in retrofit!!")
                     }
                     if (retrofitCall == RetrofitFunction.NORMALQUERY) {
