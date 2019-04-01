@@ -310,6 +310,7 @@ class MainActivity : AppCompatActivity() {
                         if (networkInfo != null && networkInfo.isConnected) {
                             rl_maincontent.visibility=View.VISIBLE
                             rl_nointernet.visibility=View.GONE
+                            runEnqueue(service, currentPage, RetrofitFunction.NORMALQUERY)
                         }
                     }
                 } else {
