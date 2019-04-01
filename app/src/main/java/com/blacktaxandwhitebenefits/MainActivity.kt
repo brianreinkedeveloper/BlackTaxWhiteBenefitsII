@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
+
         // PrivacyPolicy
         val privacyPolicyAccept = initialize()
         if (privacyPolicyAccept) {
@@ -309,6 +310,7 @@ class MainActivity : AppCompatActivity() {
                         if (networkInfo != null && networkInfo.isConnected) {
                             rl_maincontent.visibility=View.VISIBLE
                             rl_nointernet.visibility=View.GONE
+                            runEnqueue(service, currentPage, RetrofitFunction.NORMALQUERY)
                         }
                     }
                 } else {
@@ -371,11 +373,10 @@ class MainActivity : AppCompatActivity() {
         Log.i("!!!", "RetrofitFunction.NORMALQUERY: "+ currentPage)
         Log.i("!!!", "RetrofitFunction.NORMALQUERY: "+ RetrofitReadaHeadClass.knownGoodLastPage)
         displayData(this@MainActivity.myList)
-        pageButtonsRestoreState(currentPage)
+        Log.i("!!!", "retrofitCall: " + retrofitCall.toString())
+        pageButtonsRestoreState(retrofitCall, currentPage)
 
-        if (RetrofitReadaHeadClass.readAHeadStatus==RetrofitReadAHead.NOTNEEDED) {
-            stopProgressBar()
-        }
+        stopProgressBar()
     }
 
 
@@ -385,7 +386,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun pageButtonsRestoreState(currentPage: Int) = GlobalScope.launch {
+    private fun pageButtonsRestoreState(retrofitCall: RetrofitFunction, currentPage: Int) = GlobalScope.launch {
         // ** ONLY for RetrofitFunction.NORMALQUERY process. **
 
         /* Two logical ways of doing this:
@@ -400,13 +401,15 @@ class MainActivity : AppCompatActivity() {
            2) The same thing happens with PrevPage.
          */
 
-        // Do until RetrofitReadAHead is finished.
-        if (RetrofitReadaHeadClass.readAHeadStatus != RetrofitReadAHead.NOTNEEDED) {
-            do {
-                delay(250)
-            } while (RetrofitReadaHeadClass.readAHeadStatus != RetrofitReadAHead.FINISHED)
+        // Only run for Readahead work!
+        if (retrofitCall == RetrofitFunction.READAHEAD) {
+            // Do until RetrofitReadAHead is finished.
+            if (RetrofitReadaHeadClass.readAHeadStatus != RetrofitReadAHead.NOTNEEDED) {
+                do {
+                    delay(250)
+                } while (RetrofitReadaHeadClass.readAHeadStatus != RetrofitReadAHead.FINISHED)
+            }
         }
-
 //        //
 //        // RetrofitReadAHead process is finished...change butPageNext status.
 //        Log.i("!!!", "************************************")
@@ -423,9 +426,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun changePageButtonsState(currentPage: Int) = runOnUiThread {
         // Restore button states:
-        stopProgressBar()
-        recyclerView.visibility=View.VISIBLE
-//        butPagePrev.isEnabled=false
+//        stopProgressBar()
+//        recyclerView.visibility=View.VISIBLE
+////        butPagePrev.isEnabled=false
         setPrevPageInactive()
 
         // Saves Shared Preference data.
@@ -480,6 +483,7 @@ class MainActivity : AppCompatActivity() {
             runEnqueue(service, currentPage, RetrofitFunction.NORMALQUERY)}
     }
 
+
     private fun parseTitle(title: String): String {
         val titleMod: String
 
@@ -511,7 +515,8 @@ class MainActivity : AppCompatActivity() {
 
 
 
-   private fun displayPrivacyPolicy() {
+
+    private fun displayPrivacyPolicy() {
         var privacyPolicyStr = "<p><b>Black Tax and White Benefits Privacy Policy</b></p>\n" +
                 "<p>Neil Jay Warner and associates built the BlackTax and White Benefits app as an Open Source app. This SERVICE is provided by Neil Jay Warner and associates at no cost and is\n" +
                 "intended for use as is.</p>\n" +
@@ -598,4 +603,6 @@ class MainActivity : AppCompatActivity() {
             ProjectData.acceptPrivacyPolicy = privacyAcceptanceStringValue.toBoolean()
         }
     }
+
+
 }
