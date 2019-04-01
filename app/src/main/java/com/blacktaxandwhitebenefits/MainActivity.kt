@@ -373,11 +373,10 @@ class MainActivity : AppCompatActivity() {
         Log.i("!!!", "RetrofitFunction.NORMALQUERY: "+ currentPage)
         Log.i("!!!", "RetrofitFunction.NORMALQUERY: "+ RetrofitReadaHeadClass.knownGoodLastPage)
         displayData(this@MainActivity.myList)
-        pageButtonsRestoreState(currentPage)
+        Log.i("!!!", "retrofitCall: " + retrofitCall.toString())
+        pageButtonsRestoreState(retrofitCall, currentPage)
 
-        if (RetrofitReadaHeadClass.readAHeadStatus==RetrofitReadAHead.NOTNEEDED) {
-            stopProgressBar()
-        }
+        stopProgressBar()
     }
 
 
@@ -387,7 +386,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun pageButtonsRestoreState(currentPage: Int) = GlobalScope.launch {
+    private fun pageButtonsRestoreState(retrofitCall: RetrofitFunction, currentPage: Int) = GlobalScope.launch {
         // ** ONLY for RetrofitFunction.NORMALQUERY process. **
 
         /* Two logical ways of doing this:
@@ -402,13 +401,15 @@ class MainActivity : AppCompatActivity() {
            2) The same thing happens with PrevPage.
          */
 
-        // Do until RetrofitReadAHead is finished.
-        if (RetrofitReadaHeadClass.readAHeadStatus != RetrofitReadAHead.NOTNEEDED) {
-            do {
-                delay(250)
-            } while (RetrofitReadaHeadClass.readAHeadStatus != RetrofitReadAHead.FINISHED)
+        // Only run for Readahead work!
+        if (retrofitCall == RetrofitFunction.READAHEAD) {
+            // Do until RetrofitReadAHead is finished.
+            if (RetrofitReadaHeadClass.readAHeadStatus != RetrofitReadAHead.NOTNEEDED) {
+                do {
+                    delay(250)
+                } while (RetrofitReadaHeadClass.readAHeadStatus != RetrofitReadAHead.FINISHED)
+            }
         }
-
 //        //
 //        // RetrofitReadAHead process is finished...change butPageNext status.
 //        Log.i("!!!", "************************************")
@@ -425,9 +426,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun changePageButtonsState(currentPage: Int) = runOnUiThread {
         // Restore button states:
-        stopProgressBar()
-        recyclerView.visibility=View.VISIBLE
-//        butPagePrev.isEnabled=false
+//        stopProgressBar()
+//        recyclerView.visibility=View.VISIBLE
+////        butPagePrev.isEnabled=false
         setPrevPageInactive()
 
         // Saves Shared Preference data.
@@ -481,6 +482,7 @@ class MainActivity : AppCompatActivity() {
         val deferred1 = async {
             runEnqueue(service, currentPage, RetrofitFunction.NORMALQUERY)}
     }
+
 
     private fun parseTitle(title: String): String {
         val titleMod: String
