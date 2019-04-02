@@ -1,5 +1,7 @@
 package com.blacktaxandwhitebenefits
 
+import com.blacktaxandwhitebenefits.ObjectEnumClasses.TextSizeIconEnum
+
 object ProjectData {
     // TODO: Please use UPPER_CASE names for constants
     //https://kotlinlang.org/docs/reference/coding-conventions.html#property-names
@@ -28,10 +30,6 @@ object ProjectData {
 
 
     var onSavedState = false
-    private const val htmlTextSizeDefault = 22
-
-    // TODO: should be HTML_TEXT_SIZE_DEFAULT = 22
-    var htmlTextSize = htmlTextSizeDefault
 
     var butPrevPageState: Boolean? = false
     var butNextPageState: Boolean? = false
@@ -45,7 +43,18 @@ object ProjectData {
     const val putExtra_BlogWebView = "EXTRA_BLOGWEBVIEW"
     const val SHAREDPREF_KNOWNLASTPAGE = "SHAREDPREF_KNOWNLASTPAGE"
     const val SHAREDPREF_PRIVACYPOLICY = "SHAREDPREF_PRIVACYPOLICY"
+    const val SHAREDPREF_HTMLTEXTSIZE = "SHAREDPREF_HTMLTEXTSIZE"
+    const val SHAREDPREF_HTMLTEXTSIZENUM = "SHAREDPREF_HTMLTEXTSIZENUM"
 
+
+    /*  HTMLTextSizeIcon IN WebViewActivity.
+    This is the Text-sizing icon in webview.
+    */
+    // Initially, default to small icon size.
+    const val HTMLTEXTSIZEDEFAULT: Int = 18
+    const val HTMLTEXTSIZEINCREASEAMOUNT: Int = 3
+    var htmlTextSize = HTMLTEXTSIZEDEFAULT
+    var texticonSizeEnum = TextSizeIconEnum.SMALL
 }
 
 

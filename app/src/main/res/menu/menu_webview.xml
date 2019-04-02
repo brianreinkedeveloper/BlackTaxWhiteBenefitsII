@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+        <!--android:icon="@drawable/baseline_share_black_18dp"-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/textsizeicon_small"
+        android:title="nothing"
+        android:icon="@drawable/ic_action_textsizeicon_small"
+        android:visible="true"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/textsizeicon_med"
+        android:title=""
+        android:icon="@drawable/ic_action_textsizeicon_medium"
+        android:visible="false"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/textsizeicon_large"
+        android:title=""
+        android:icon="@drawable/ic_action_textsizeicon_large"
+        android:visible="false"
+        app:showAsAction="always" />
+
+    <item
+          android:id="@+id/menuitem_share"
+          android:title=""
+          android:icon="@drawable/ic_baseline_share_24px"
+          app:showAsAction="always"
+    />
+</menu>
