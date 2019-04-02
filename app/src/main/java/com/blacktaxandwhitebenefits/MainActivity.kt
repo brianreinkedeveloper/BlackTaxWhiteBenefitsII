@@ -14,6 +14,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.work.*
+import com.blacktaxandwhitebenefits.ObjectEnumClasses.TextSizeIconEnum
 import com.blacktaxandwhitebenefits.PageReadaHead.RetrofitFunction
 import com.blacktaxandwhitebenefits.PageReadaHead.RetrofitReadAHead
 import com.blacktaxandwhitebenefits.PageReadaHead.RetrofitReadaHeadClass
@@ -604,7 +605,35 @@ class MainActivity : AppCompatActivity() {
         } else {
             ProjectData.acceptPrivacyPolicy = privacyAcceptanceStringValue.toBoolean()
         }
+
+        //
+        // Gets information regarding HTML Text Sizes
+        //
+        val getHtmlTextSize = getAppSharedPreferences(this@MainActivity, ProjectData.SHAREDPREF_HTMLTEXTSIZE)
+        if (getHtmlTextSize != "") {
+            // assign our new value.
+            // Note: ProjectData.htmlTextSize already comes with a default value!
+            ProjectData.htmlTextSize = getHtmlTextSize!!.toInt()
+        }
+
+        val getHtmlTextSizeEnum = getAppSharedPreferences(this@MainActivity, ProjectData.SHAREDPREF_HTMLTEXTSIZENUM)
+        if (getHtmlTextSizeEnum != "") {
+            // assign our new value.
+            // Note: ProjectData.texticonSizeEnum already comes with a default value!
+            when (getHtmlTextSizeEnum) {
+                TextSizeIconEnum.SMALL.name -> {
+                    ProjectData.texticonSizeEnum = TextSizeIconEnum.SMALL
+                    ProjectData.htmlTextSize = ProjectData.HTMLTEXTSIZEDEFAULT
+                }
+                TextSizeIconEnum.MEDIUM.name -> {
+                    ProjectData.texticonSizeEnum = TextSizeIconEnum.MEDIUM
+                    ProjectData.htmlTextSize = ProjectData.HTMLTEXTSIZEDEFAULT + ProjectData.HTMLTEXTSIZEINCREASEAMOUNT
+                }
+                TextSizeIconEnum.LARGE.name -> {
+                    ProjectData.texticonSizeEnum = TextSizeIconEnum.LARGE
+                    ProjectData.htmlTextSize = ProjectData.HTMLTEXTSIZEDEFAULT + ProjectData.HTMLTEXTSIZEINCREASEAMOUNT + ProjectData.HTMLTEXTSIZEINCREASEAMOUNT
+                }
+            }
+        }
     }
-
-
 }

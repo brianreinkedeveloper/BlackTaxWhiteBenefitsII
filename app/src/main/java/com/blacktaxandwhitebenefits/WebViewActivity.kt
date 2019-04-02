@@ -8,7 +8,9 @@ import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.view.MenuItem
-import android.webkit.WebSettings
+import com.blacktaxandwhitebenefits.ObjectEnumClasses.TextSizeIconEnum
+import com.blacktaxandwhitebenefits.ProjectData.HTMLTEXTSIZEINCREASEAMOUNT
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences.setAppSharedPreferencesSync
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_webview.*
 
@@ -21,6 +23,12 @@ class WebViewActivity: AppCompatActivity() {
     private lateinit var urlLink: String
     private lateinit var blogArticleData: ArrayList<String>
 
+    // TextSizeIcon
+    private var iconTextSizeSmall: MenuItem? = null
+    private var iconTextSizeMedium: MenuItem? = null
+    private var iconTextSizeLarge: MenuItem? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_webview)
@@ -31,25 +39,43 @@ class WebViewActivity: AppCompatActivity() {
             loadArticleWebLink(blogArticleData[4])
         }
 
+        initializeWebView()
         loadPageData()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_share, menu)
-        return true
+        // TextIconSize
+        menuInflater.inflate(R.menu.menu_webview, menu)
+
+        this.iconTextSizeSmall = menu?.findItem(R.id.textsizeicon_small)
+        this.iconTextSizeMedium = menu?.findItem(R.id.textsizeicon_med)
+        this.iconTextSizeLarge = menu?.findItem(R.id.textsizeicon_large)
+
+        // set icon size
+        clickedTextSizeIcon(ProjectData.texticonSizeEnum, "init")
+
+        return super.onCreateOptionsMenu(menu)
     }
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val menuID = item.itemId
-        return when (menuID) {
+        when (item.itemId) {
             R.id.menuitem_share -> {
                 sendBlog(resources.getString(R.string.app_name), this.titleData, this.urlLink)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+                return true }
+            R.id.textsizeicon_small -> {
+                clickedTextSizeIcon(TextSizeIconEnum.SMALL)
+                return true}
+            R.id.textsizeicon_med -> {
+                clickedTextSizeIcon(TextSizeIconEnum.MEDIUM)
+                return true}
+            R.id.textsizeicon_large -> {
+                clickedTextSizeIcon(TextSizeIconEnum.LARGE)
+                return true}
+            else -> return super.onOptionsItemSelected(item)
         }
     }
+
 
     private fun sendBlog(appTitle: String, blogTitle: String, blogURL: String) {
         val messageStr = "From: $appTitle:\n\n$blogTitle\n\n$blogURL"
@@ -140,12 +166,6 @@ class WebViewActivity: AppCompatActivity() {
 
         // Replaced webview.loadData with webview.loadDataWithBaseURL.  For some reason, this works better in converting HTML UTF chars.
         webview.loadDataWithBaseURL(null, htmlContext, "text/html", "utf-8", null)
-        
-        //
-        // Changes Webview HTML text size!!
-        //
-        val websettings : WebSettings = webview.settings
-        websettings.defaultFontSize = ProjectData.htmlTextSize
     }
 
 
@@ -179,5 +199,91 @@ class WebViewActivity: AppCompatActivity() {
         intent.addCategory(Intent.CATEGORY_BROWSABLE)
         intent.data = Uri.parse(webURL)
         startActivity(intent)
+    }
+
+
+    private fun initializeWebView() {
+        /* Sets TextSizeIcon content */
+        // read in value from shared pref.  If no shared pref, set to small.
+
+//        iconTextSizeSmall?.setVisible(true)
+
+
+
+        //
+        // Changes Webview HTML text size!!
+        //
+        setWebViewSize(ProjectData.htmlTextSize)
+    }
+
+
+    private fun clickedTextSizeIcon(textSizeEnumVal: TextSizeIconEnum, initialTime: String = "notinit"): Unit {
+        // This is the menu item we clicked on...so we go to the next higher one.
+
+        when(textSizeEnumVal) {
+            TextSizeIconEnum.SMALL -> {
+                if (initialTime != "init") {
+                    setSmallHtmlIconSize()
+                    ProjectData.texticonSizeEnum = TextSizeIconEnum.MEDIUM
+                    ProjectData.htmlTextSize += HTMLTEXTSIZEINCREASEAMOUNT
+                } else {
+                    // init--sets small actually...assumes we're pushing htmltextsizeicon
+                    setLargeHtmlIconSize()
+                }
+            }
+            TextSizeIconEnum.MEDIUM -> {
+                if (initialTime != "init") {
+                    setMediumHtmlIconSize()
+                    ProjectData.texticonSizeEnum = TextSizeIconEnum.LARGE
+                    ProjectData.htmlTextSize += HTMLTEXTSIZEINCREASEAMOUNT
+                } else {
+                    // init--sets medium actually...assumes we're pushing htmltextsizeicon
+                    setSmallHtmlIconSize()
+                }
+            }
+            TextSizeIconEnum.LARGE -> {
+                if (initialTime != "init") {
+                    setLargeHtmlIconSize()
+                    ProjectData.texticonSizeEnum = TextSizeIconEnum.SMALL
+                    ProjectData.htmlTextSize = ProjectData.HTMLTEXTSIZEDEFAULT
+                } else {
+                    // init--sets large actually...assumes we're pushing htmltextsizeicon
+                    setMediumHtmlIconSize()
+                }
+            }
+        }
+
+        // Changes Webview HTML text size!!
+        setWebViewSize(ProjectData.htmlTextSize)
+
+        // Save new setting to sharedPref - async.
+        setAppSharedPreferencesSync(this@WebViewActivity, ProjectData.SHAREDPREF_HTMLTEXTSIZE, ProjectData.htmlTextSize.toString())
+        setAppSharedPreferencesSync(this@WebViewActivity, ProjectData.SHAREDPREF_HTMLTEXTSIZENUM, ProjectData.texticonSizeEnum.toString())
+    }
+
+
+    private fun setWebViewSize(newHtmlTextSize: Int) {
+        webview.settings.apply {
+            defaultFontSize = newHtmlTextSize
+        }
+    }
+
+
+    private fun setSmallHtmlIconSize() {
+        iconTextSizeLarge?.setVisible(false)
+        iconTextSizeSmall?.setVisible(false)
+        iconTextSizeMedium?.setVisible(true)
+    }
+
+    private fun setMediumHtmlIconSize() {
+        iconTextSizeSmall?.setVisible(false)
+        iconTextSizeMedium?.setVisible(false)
+        iconTextSizeLarge?.setVisible(true)
+    }
+
+    private fun setLargeHtmlIconSize() {
+        iconTextSizeLarge?.setVisible(false)
+        iconTextSizeMedium?.setVisible(false)
+        iconTextSizeSmall?.setVisible(true)
     }
 }
