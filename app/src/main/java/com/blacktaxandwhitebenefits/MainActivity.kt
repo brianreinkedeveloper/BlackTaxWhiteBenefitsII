@@ -6,8 +6,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
+import androidx.appcompat.app.AppCompatActivity
 import android.text.Html
 import android.util.Log
 import android.view.Menu
@@ -20,9 +19,10 @@ import com.blacktaxandwhitebenefits.PageReadaHead.RetrofitReadAHead
 import com.blacktaxandwhitebenefits.PageReadaHead.RetrofitReadaHeadClass
 import com.blacktaxandwhitebenefits.WorkManager.BackgroundTask
 import com.blacktaxandwhitebenefits.WorkManager.NOTIFICATION_WORKREQUEST_TAG
+import com.blacktaxandwhitebenefits.adapters.BlogAdapter
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.BlogArticles
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.GetBlogService
-import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.RecycleDTO
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.Blog
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.RetrofitClientInstance
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences.getAppSharedPreferences
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences.getAppSharedPreferencesInt
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     // Retrofit service.
     private val service = RetrofitClientInstance.retrofitInstance?.create(GetBlogService::class.java)
-    var myList = mutableListOf<RecycleDTO>()
+    var myList = mutableListOf<Blog>()
 
     // Action bar icons
     var actionbarNavAfterActive: MenuItem? = null
@@ -369,7 +369,7 @@ class MainActivity : AppCompatActivity() {
             // Adds to the recycler List DTO.
             this@MainActivity.myList.add(
                 i,
-                RecycleDTO(title, urlLink, date, id, modifiedDate, htmlArticle, imageBlogURL)
+                Blog(title, urlLink, date, id, modifiedDate, htmlArticle, imageBlogURL)
             )
         }
 
@@ -455,13 +455,13 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun displayData(list : MutableList<RecycleDTO>) {
+    fun displayData(list : MutableList<Blog>) {
         //
-        // Call RecyclerView Adapter
+        // Call RecyclerView BlogAdapter
         //
         recyclerView.apply {
-            val llm = LinearLayoutManager(this@MainActivity)
-            val adapter = Adapter(list)
+            val llm = androidx.recyclerview.widget.LinearLayoutManager(this@MainActivity)
+            val adapter = BlogAdapter(list)
             recyclerView.adapter=adapter
             recyclerView.layoutManager=llm
         }

@@ -1,20 +1,25 @@
-package com.blacktaxandwhitebenefits
+package com.blacktaxandwhitebenefits.adapters
 
 import android.content.Context
 import android.content.Intent
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.RecycleDTO
+import com.blacktaxandwhitebenefits.ProjectData
+import com.blacktaxandwhitebenefits.R
+import com.blacktaxandwhitebenefits.WebViewActivity
+import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.Networking.Blog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.synthetic.main.recycle_item.view.*
 import java.util.*
 
-class Adapter(val myList: MutableList<RecycleDTO>): RecyclerView.Adapter<Adapter.ViewHolder>() {
+
+
+class BlogAdapter(val myList: MutableList<Blog>): RecyclerView.Adapter<BlogAdapter.ViewHolder>() {
     private lateinit var adapterContext: Context
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -55,7 +60,7 @@ class Adapter(val myList: MutableList<RecycleDTO>): RecyclerView.Adapter<Adapter
     }
 
 
-    inner class ViewHolder (v: View) : RecyclerView.ViewHolder(v), View.OnClickListener {
+    inner class ViewHolder (v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v), View.OnClickListener {
         // No findViewById() because this version of Android Studio uses
         //    kotlin-android-extensions plugin, which avoids the use of needing findViewById().
         val titleView: TextView = v.text_title
