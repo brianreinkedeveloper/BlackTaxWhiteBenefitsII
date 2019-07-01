@@ -12,6 +12,9 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.*
 import com.blacktaxandwhitebenefits.ObjectEnumClasses.TextSizeIconEnum
 import com.blacktaxandwhitebenefits.PageReadaHead.RetrofitFunction
@@ -28,6 +31,8 @@ import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.A
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences.getAppSharedPreferencesInt
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences.setAppSharedPreferencesAsync
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences.setAppSharedPreferencesSync
+import com.blacktaxandwhitebenefits.data.SavedBlog
+import com.blacktaxandwhitebenefits.viewmodels.SavedBlogViewModel
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
@@ -57,6 +62,10 @@ class MainActivity : AppCompatActivity() {
     var actionbarNavBeforeActive: MenuItem? = null
     var actionbarNavBeforeInActive: MenuItem? = null
 
+    // ViewModel for saved blogs.
+    private lateinit var savedBlogViewModel: SavedBlogViewModel
+
+
     //
     // MainActivity
     //
@@ -78,6 +87,27 @@ class MainActivity : AppCompatActivity() {
             //
             loadRetrofitPages(service, ProjectData.currentPage)
         }
+
+
+
+        //test only!!!!!
+        savedBlogViewModel = ViewModelProviders.of(this).get(SavedBlogViewModel::class.java)
+        savedBlogViewModel.getAllSavedBlogs().observe(this, Observer<List<SavedBlog>> {
+//            adapter.submitList(it)
+        })
+
+//        val blogs_contents = savedBlogViewModel.getAllSavedBlogs()
+//        var counter: Int = -1
+//        for (i in blogs_contents.value!!) {
+//            counter++
+//            if (blogs_contents.value != null) {
+//                Log.i("!!!", "Record ${counter}: ${blogs_contents.value!![counter].title}")
+//                Log.i("!!!", "Record ${counter}: ${blogs_contents.value!![counter].date}")
+//            }
+//        }
+
+
+
     }
 
 
@@ -460,7 +490,7 @@ class MainActivity : AppCompatActivity() {
         // Call RecyclerView BlogAdapter
         //
         recyclerView.apply {
-            val llm = androidx.recyclerview.widget.LinearLayoutManager(this@MainActivity)
+            val llm = LinearLayoutManager(this@MainActivity)
             val adapter = BlogAdapter(list)
             recyclerView.adapter=adapter
             recyclerView.layoutManager=llm

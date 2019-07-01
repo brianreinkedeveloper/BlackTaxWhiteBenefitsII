@@ -18,6 +18,9 @@ import kotlinx.android.synthetic.main.recycle_item.view.*
 import java.util.*
 
 
+/*
+    BlogAdapter is the RecyclerView adapter for viewing of output from the website.
+ */
 
 class BlogAdapter(val myList: MutableList<Blog>): RecyclerView.Adapter<BlogAdapter.ViewHolder>() {
     private lateinit var adapterContext: Context
