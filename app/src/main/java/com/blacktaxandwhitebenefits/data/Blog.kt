@@ -5,7 +5,7 @@ data class Blog (
     val title: String,
     val urlLink: String,
     val date: String,
-    val id: String,
+    val id: String,                  //unique ID of article.
     val modifiedDate: String,
     val htmlArticle: String,
     val imageBlogURL: String

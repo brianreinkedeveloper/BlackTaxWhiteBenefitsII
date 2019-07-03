@@ -30,8 +30,12 @@
 
         <activity android:name="com.blacktaxandwhitebenefits.WebViewActivity"
                   android:label="Blog Item"
-                  android:screenOrientation="portrait"
-        >
+                  android:screenOrientation="portrait" >
+        </activity>
+
+        <activity android:name="com.blacktaxandwhitebenefits.SavedBookMarksActivity"
+            android:label="Saved Bookmarks"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 </manifest>

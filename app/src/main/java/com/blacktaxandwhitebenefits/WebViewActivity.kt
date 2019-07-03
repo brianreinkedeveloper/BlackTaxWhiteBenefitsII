@@ -6,11 +6,18 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.text.Html
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelStore
+import androidx.room.PrimaryKey
 import com.blacktaxandwhitebenefits.ObjectEnumClasses.TextSizeIconEnum
 import com.blacktaxandwhitebenefits.ProjectData.HTMLTEXTSIZEINCREASEAMOUNT
 import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.AppSharedPreferences.setAppSharedPreferencesSync
+import com.blacktaxandwhitebenefits.data.SavedBlog
+import com.blacktaxandwhitebenefits.viewmodels.SavedBlogViewModel
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_webview.*
 
@@ -21,17 +28,49 @@ class WebViewActivity: AppCompatActivity() {
     private lateinit var modPostedDate: String
     private lateinit var modDate: String
     private lateinit var urlLink: String
+    private lateinit var id: String
     private lateinit var blogArticleData: ArrayList<String>
+
+    // Additional value from SavedBlog.
+    private var databaseId: Int = 0
+    private var isBookMarkFilled: Boolean = false
+
+
+    // Bookmark feature change---->
+    /*
+        blogArticleData[0] --> Article posted date.
+        blogArticleData[1] --> Title
+        blogArticleData[2] --> Image URL
+        blogArticleData[3] --> HTML article
+        blogArticleData[4] --> URL Link
+        blogArticleData[5] --> ID; unique posted article ID.
+     <-------------------| */
+
 
     // TextSizeIcon
     private var iconTextSizeSmall: MenuItem? = null
     private var iconTextSizeMedium: MenuItem? = null
     private var iconTextSizeLarge: MenuItem? = null
 
+    // BookmarkIcon
+    private var iconBookmarkUnused: MenuItem? = null
+    private var iconBookmarkUsed: MenuItem? = null
 
+    private lateinit var mViewModelWebView: SavedBlogViewModel
+
+
+    /* *************************************************
+    onCreate() must be completed first before anything else so it gives the menuOptions widgets
+    time to initialize.
+    *************************************************  */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_webview)
+
+        mViewModelWebView = ViewModelProviders.of(this).get(SavedBlogViewModel::class.java)
+        mViewModelWebView.getAllSavedBlogs().observe(this, Observer<List<SavedBlog>> {
+            checkBlogWasSaved(mViewModelWebView)
+        })
 
         blogArticleData= intent.getStringArrayListExtra(ProjectData.putExtra_BlogWebView)
 
@@ -51,8 +90,14 @@ class WebViewActivity: AppCompatActivity() {
         this.iconTextSizeMedium = menu?.findItem(R.id.textsizeicon_med)
         this.iconTextSizeLarge = menu?.findItem(R.id.textsizeicon_large)
 
+        this.iconBookmarkUnused = menu?.findItem(R.id.menuitem_bookmark_unused)
+        this.iconBookmarkUsed = menu?.findItem(R.id.menuitem_bookmark_used)
+
         // set icon size
         clickedTextSizeIcon(ProjectData.texticonSizeEnum, "init")
+
+        // bookmark feature
+        fillBookmark (this.isBookMarkFilled)
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -72,9 +117,16 @@ class WebViewActivity: AppCompatActivity() {
             R.id.textsizeicon_large -> {
                 clickedTextSizeIcon(TextSizeIconEnum.LARGE)
                 return true}
+            R.id.menuitem_bookmark_unused -> {
+                setBookMarkIcon(false)
+                return true }
+            R.id.menuitem_bookmark_used -> {
+                setBookMarkIcon(true)
+                return true }
             else -> return super.onOptionsItemSelected(item)
         }
-    }
+
+}
 
 
     private fun sendBlog(appTitle: String, blogTitle: String, blogURL: String) {
@@ -100,6 +152,7 @@ class WebViewActivity: AppCompatActivity() {
         //
         this.titleData = blogArticleData[1]
         this.urlLink = blogArticleData[4]
+        this.id = blogArticleData[5]
 
         val maxStringLength: Int = resources.getInteger(R.integer.title_maxlength)
         var currentPos=maxStringLength
@@ -126,8 +179,18 @@ class WebViewActivity: AppCompatActivity() {
         //
         // Blog posted date: This is the format of the blog: 2018-11-21T21:10:05      (YYYY/month//day/T/hour/min/sec
         //
-        this.modPostedDate = blogDateConversion(blogArticleData[0])
 
+        // |---Added for bookmark feature change ------->
+        if (!(blogArticleData.lastIndex == 6 && blogArticleData[6] == resources.getString(R.string.function_bookmark))) {
+            /*  We're running this only if it's not coming from the bookmark activity.  Why?
+                 Because the dates from the bookmark activity are already formatted.
+             */
+            this.modPostedDate = blogDateConversion(blogArticleData[0])
+        } else {
+            // Coming from bookmark activity.
+            this.modPostedDate = blogArticleData[0]
+        }
+        // <-----bookmark feature change---------|
         this.modDate="Posted Date: $modPostedDate"
         txtWebViewPostedDate.text = modDate
 
@@ -262,6 +325,50 @@ class WebViewActivity: AppCompatActivity() {
     }
 
 
+    private fun setBookMarkIcon(isBookMarkFilledIcon: Boolean) {
+        // Clicked on the bookmark save option.
+        /* isBookMarkFilledIcon = true --> filled (or saved).  Need to remove from saved list.
+           isBookMarkFilledIcon = false --> not filled/not saved.  We now want to save the bookmark.
+         */
+
+        // Get a SavedBlog object to insert or delete.
+        if (!isBookMarkFilledIcon) {
+            // Save bookmark.
+            val newSavedBlog = SavedBlog(
+                this.titleData,
+                this.urlLink,
+                this.modPostedDate,
+                this.id,
+                this.modDate,
+                this.blogArticleData[3],          // html article
+                this.blogArticleData[2]           // image URL
+            )
+            mViewModelWebView.insert(newSavedBlog)
+        } else {
+            // Delete bookmark.  To delete a bookmark, all you need is SavedBlog object, including
+            //  the primary key of the database record...here, it is 'databaseId'.
+            val newDeletedBlog = SavedBlog(
+                this.titleData,
+                this.urlLink,
+                this.modPostedDate,
+                this.id,
+                this.modDate,
+                this.blogArticleData[3],              // html article
+                this.blogArticleData[2],             // image URL
+                this.databaseId
+            )
+
+            // delete the bookmark.
+            mViewModelWebView.delete(newDeletedBlog)
+        }
+
+        // Now change the icon.  But we are setting the opposite value.
+        fillBookmark(!isBookMarkFilledIcon)
+    }
+
+
+
+
     private fun setWebViewSize(newHtmlTextSize: Int) {
         webview.settings.apply {
             defaultFontSize = newHtmlTextSize
@@ -285,5 +392,46 @@ class WebViewActivity: AppCompatActivity() {
         iconTextSizeLarge?.setVisible(false)
         iconTextSizeMedium?.setVisible(false)
         iconTextSizeSmall?.setVisible(true)
+    }
+
+
+    /* ***********************************************************************************
+    -- Checks to see if the Blog was saved in the database...if so, fill in the bookmark icon.
+    -- We're doing a simple loop because we're only going to have a limited # of saved bookmarks!
+    -- How this works.  We'll loop thru the saved entries from the database and see if the Id matches
+    to the current id loaded on page.
+    -- If it needs to be saved, calls routine to fill in the bookmark.
+  ********************************************************************************** */
+    private fun checkBlogWasSaved(mViewModelWebView: SavedBlogViewModel) {
+        // 7/1/19
+
+        val blogs_contents = mViewModelWebView.getAllSavedBlogs()
+        var counter: Int = -1
+        for (i in blogs_contents.value!!) {
+            counter++
+            if (blogs_contents.value != null) {
+                if (this.id == blogs_contents.value!![counter].id) {
+                    // Fill in the bookmark.
+//                    fillBookmark(true)
+                    this.isBookMarkFilled = true        // almost should have a callback.
+                    this.databaseId = blogs_contents.value!![counter].databaseId
+                }
+            }
+        }
+    }
+
+
+    private fun fillBookmark(fillBookmarkIcon: Boolean) {
+        this.isBookMarkFilled = fillBookmarkIcon
+
+        if (fillBookmarkIcon) {
+            // fill the bookmark
+            iconBookmarkUnused?.setVisible(false)
+            iconBookmarkUsed?.setVisible(true)
+        } else {
+            // bookmark should be removed.
+            iconBookmarkUsed?.setVisible(false)
+            iconBookmarkUnused?.setVisible(true)
+        }
     }
 }

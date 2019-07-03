@@ -8,4 +8,7 @@
 
     <dimen name="webViewImageSize">300dp</dimen>
     <dimen name="title_font_size">17sp</dimen>
+
+    <!-- no bookmark records -->
+    <dimen name="bookmark_missing_size">30sp</dimen>
 </resources>

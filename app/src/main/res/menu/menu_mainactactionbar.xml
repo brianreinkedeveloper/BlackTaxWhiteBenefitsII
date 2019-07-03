@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<item
+		android:id="@+id/menu_showbookmarks"
+		android:title="showbookmarks"
+		android:icon="@drawable/ic_collections_bookmark_white_24dp"
+		android:visible="true"
+		app:showAsAction="always" />
+	<item
 		android:id="@+id/navbeforeactive"
 		android:title="navbeforeactive"
 		android:icon="@drawable/ic_action_navigate_before_white_24dp_activefocused"

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blacktaxandwhitebenefits.R
 import com.blacktaxandwhitebenefits.data.SavedBlog
 import kotlinx.android.synthetic.main.recycle_item.view.*
+import kotlinx.android.synthetic.main.saved_bookmark_item.view.*
 
 
 /*
@@ -18,7 +19,6 @@ import kotlinx.android.synthetic.main.recycle_item.view.*
  */
 
 class SavedBlogAdapter : ListAdapter<SavedBlog, SavedBlogAdapter.ViewHolderBlog>(DIFF_CALLBACK){
-
     private var listener: OnItemClickListener? = null
 
     interface OnItemClickListener {
@@ -46,15 +46,14 @@ class SavedBlogAdapter : ListAdapter<SavedBlog, SavedBlogAdapter.ViewHolderBlog>
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderBlog {
-        val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.saved_blog_item, parent, false)
+        val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.saved_bookmark_item, parent, false)
         return ViewHolderBlog(itemView)
     }
 
 
     override fun onBindViewHolder(holder: ViewHolderBlog, position: Int) {
         val currentBlog: SavedBlog = getItem(position)
-
-        holder.textViewTitle.text = currentBlog.title
+        holder.textBookmarkTitle.text = currentBlog.title
     }
 
     fun getNoteAt(position: Int): SavedBlog {
@@ -62,7 +61,7 @@ class SavedBlogAdapter : ListAdapter<SavedBlog, SavedBlogAdapter.ViewHolderBlog>
     }
 
     inner class ViewHolderBlog(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var textViewTitle: TextView = itemView.text_title
+        var textBookmarkTitle: TextView = itemView.text_bookmark_title
 
         init {
             itemView.setOnClickListener {
@@ -70,12 +69,6 @@ class SavedBlogAdapter : ListAdapter<SavedBlog, SavedBlogAdapter.ViewHolderBlog>
                 if (position != RecyclerView.NO_POSITION) {
                     listener?.onItemClick(getItem(position))
                 }
-            }
-
-            itemView.setOnLongClickListener {
-                Log.i("!!!", "hit long click listener")
-//                viewModelInstance.delete(getNoteAt(adapterPosition))
-                true
             }
         }
     }

@@ -77,13 +77,14 @@ class BlogAdapter(val myList: MutableList<Blog>): RecyclerView.Adapter<BlogAdapt
         override fun onClick(v: View?) {
             val position  = layoutPosition
 
-            val webViewDataArray = ArrayList<String>(4)
+            val webViewDataArray = ArrayList<String>(6)
             try {
                 webViewDataArray.add(0, myList[position].date)
                 webViewDataArray.add(1, myList[position].title)
                 webViewDataArray.add(2, myList[position].imageBlogURL)
                 webViewDataArray.add(3, myList[position].htmlArticle)
                 webViewDataArray.add(4, myList[position].urlLink)
+                webViewDataArray.add(5, myList[position].id)
 
                 val mIntentWebViewActivity = Intent(v?.context, WebViewActivity::class.java)
                 // pass in some data to the intent.

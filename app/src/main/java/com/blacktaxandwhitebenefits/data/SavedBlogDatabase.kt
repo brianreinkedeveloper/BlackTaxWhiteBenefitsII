@@ -28,7 +28,11 @@ abstract class SavedBlogDatabase : RoomDatabase() {
                         SavedBlogDatabase::class.java, "blogs_database"
                     )
                         .fallbackToDestructiveMigration() // when version increments, it migrates (deletes db and creates new) - else it crashes
-                        .addCallback(roomCallback)
+                        // We're not using the callback here.  Keeping it here for example purposes.
+                        // This callback runs at table creation...in this case loads some sample data.
+                        //  *** DO NOT USE ----------->
+                        //  .addCallback(roomCallback)
+                        // <-----DO NOT USE ----------|
                         .build()
                 }
             }

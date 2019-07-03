@@ -9,6 +9,7 @@ interface SavedBlogDao {
     fun insert(savedBlog: SavedBlog)
 
     @Update
+    // Only used when editing an existing item. Not used in this project.
     fun update(savedBlog: SavedBlog)
 
     @Delete

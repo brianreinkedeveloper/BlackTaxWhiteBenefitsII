@@ -26,6 +26,20 @@
           android:id="@+id/menuitem_share"
           android:title=""
           android:icon="@drawable/ic_baseline_share_24px"
-          app:showAsAction="always"
-    />
+          app:showAsAction="always" />
+
+    <!-- Bookmarks feature -->
+    <item
+        android:id="@+id/menuitem_bookmark_unused"
+        android:title=""
+        android:icon="@drawable/ic_bookmark_border_white_24dp"
+        android:visible="true"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menuitem_bookmark_used"
+        android:title=""
+        android:icon="@drawable/ic_bookmark_filled_white_24dp"
+        android:visible="false"
+        app:showAsAction="always" />
 </menu>

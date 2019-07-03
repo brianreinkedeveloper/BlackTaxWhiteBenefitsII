@@ -14,8 +14,8 @@ data class SavedBlog (
     // Database content
     val title: String,
     val urlLink: String,
-    val date: String,
-    val id: String,
+    val date: String,           // posted date of article.
+    val id: String,             //unique ID of article. This plus the title is really all we need.
     val modifiedDate: String,
     val htmlArticle: String,
     val imageBlogURL: String,

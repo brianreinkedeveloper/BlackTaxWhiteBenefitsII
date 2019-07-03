@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent" >
+
+	<androidx.recyclerview.widget.RecyclerView
+		android:id="@+id/bookmark_recycler_view"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		tools:listitem="@layout/saved_bookmark_item"
+		tools:itemCount="10"/>
+
+	<TextView
+		android:id="@+id/text_bookmark_noitems"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="No saved bookmarks"
+		android:textStyle="bold"
+		android:textSize="@dimen/bookmark_missing_size"
+		android:visibility="invisible"
+		android:layout_centerInParent="true" />
+
+</RelativeLayout>

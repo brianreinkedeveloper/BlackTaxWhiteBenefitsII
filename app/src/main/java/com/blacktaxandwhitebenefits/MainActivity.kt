@@ -3,6 +3,7 @@ package com.blacktaxandwhitebenefits
 
 
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
@@ -87,27 +88,6 @@ class MainActivity : AppCompatActivity() {
             //
             loadRetrofitPages(service, ProjectData.currentPage)
         }
-
-
-
-        //test only!!!!!
-        savedBlogViewModel = ViewModelProviders.of(this).get(SavedBlogViewModel::class.java)
-        savedBlogViewModel.getAllSavedBlogs().observe(this, Observer<List<SavedBlog>> {
-//            adapter.submitList(it)
-        })
-
-//        val blogs_contents = savedBlogViewModel.getAllSavedBlogs()
-//        var counter: Int = -1
-//        for (i in blogs_contents.value!!) {
-//            counter++
-//            if (blogs_contents.value != null) {
-//                Log.i("!!!", "Record ${counter}: ${blogs_contents.value!![counter].title}")
-//                Log.i("!!!", "Record ${counter}: ${blogs_contents.value!![counter].date}")
-//            }
-//        }
-
-
-
     }
 
 
@@ -147,6 +127,11 @@ class MainActivity : AppCompatActivity() {
                 // next page
                 pressNextPage()
                 return true}
+            R.id.menu_showbookmarks -> {
+                // bookmark collection
+                showBookMarkList()
+                return true
+            }
             else -> return super.onOptionsItemSelected(item)
         }
     }
@@ -666,4 +651,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
+    /*  Loads SavedBookMarksActivity.  */
+    private fun showBookMarkList() {
+        val intent = Intent(baseContext, SavedBookMarksActivity::class.java)
+        startActivity(intent)
+    }
+
+
+
+
 }
