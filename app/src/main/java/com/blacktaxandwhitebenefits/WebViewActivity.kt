@@ -19,6 +19,7 @@ import com.blacktaxandwhitebenefits.blacktaxandwhitebenefits.ObjectEnumClasses.A
 import com.blacktaxandwhitebenefits.data.SavedBlog
 import com.blacktaxandwhitebenefits.viewmodels.SavedBlogViewModel
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_webview.*
 
 
@@ -118,9 +119,21 @@ class WebViewActivity: AppCompatActivity() {
                 clickedTextSizeIcon(TextSizeIconEnum.LARGE)
                 return true}
             R.id.menuitem_bookmark_unused -> {
-                setBookMarkIcon(false)
+                // Bookmark is currently unused.
+                // We have to determine to see if eligible to save another bookmark.
+                val viewModelLastIndex = mViewModelWebView.getAllSavedBlogs().value?.lastIndex
+                if (viewModelLastIndex != null) {
+                    if (viewModelLastIndex < (resources.getInteger(R.integer.maxBookmarks)-1 ))  {
+                        setBookMarkIcon(false)
+                    } else {
+                        // Using snackbar because Toast doesn't show up well!
+                        val snackbar = Snackbar.make(coordinatorLayout, "You have too many bookmarks. You'll have to delete some bookmarks before being able to save more.", Snackbar.LENGTH_INDEFINITE)
+                        snackbar.show()
+                    }
+                }
                 return true }
             R.id.menuitem_bookmark_used -> {
+                // Bookmark is currently used.
                 setBookMarkIcon(true)
                 return true }
             else -> return super.onOptionsItemSelected(item)
